@@ -1,0 +1,15 @@
+<nav>
+  <strong>medicine Finder</strong>
+
+@if (auth.currentUser()) {
+  @if (auth.currentUser()?.role === 'Admin') {
+    <a routerLink="/admin">Dashboard</a>
+  }
+  @if (auth.currentUser()?.role === 'PharmacyOwner') {
+  <a routerLink="/owner">My pharmacy</a>
+}
+  <a routerLink="/search">Find medicine</a>
+
+  <span>{{ auth.currentUser()?.fullName }} ({{ auth.currentUser()?.role }})</span>
+  <button (click)="logout()">Logout</button>
+}
