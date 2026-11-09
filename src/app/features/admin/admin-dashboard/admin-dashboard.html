@@ -1,1 +1,22 @@
-<h2>admin dashboard</h2>
+<h2>Pending pharmacies</h2>
+
+@if (loading()) {
+  <p>Loading...</p>
+} @else if (pending().length === 0) {
+  <p>No pharmacies waiting for approval.</p>
+} @else {
+  @for (p of pending(); track p.id) {
+    <div class="card">
+      <h3>{{ p.name }}</h3>
+      <p>Address: {{ p.address }}</p>
+      <p>Phone: {{ p.phone }}</p>
+      <p>License: {{ p.licenseNumber }}</p>
+      <p>Hours: {{ p.openingTime }} - {{ p.closingTime }}</p>
+
+      <div class="actions">
+        <button class="approve" (click)="decide(p.id, 'Approved')">Approve</button>
+        <button class="reject" (click)="decide(p.id, 'Rejected')">Reject</button>
+      </div>
+    </div>
+  }
+}

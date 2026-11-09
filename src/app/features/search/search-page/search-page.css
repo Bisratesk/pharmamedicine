@@ -1,0 +1,78 @@
+.search-bar {
+  display: flex;
+  gap: 8px;
+  max-width: 520px;
+  margin: 24px auto;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  padding: 10px 16px;
+  background: #2a7de1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:disabled { background: #aaa; cursor: not-allowed; }
+
+.result {
+  max-width: 520px;
+  margin: 12px auto;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.price { font-weight: bold; color: #1e8e3e; }
+.empty { text-align: center; color: #666; }
+
+.filters {
+  display: flex;
+  gap: 16px;
+  max-width: 520px;
+  margin: 0 auto 8px;
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.filters input,
+.filters select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.prescription {
+  max-width: 520px;
+  margin: 16px auto;
+  padding: 16px;
+  border: 1px dashed #aaa;
+  border-radius: 8px;
+}
+
+.prescription img {
+  display: block;
+  max-width: 100%;
+  max-height: 220px;
+  margin: 12px 0;
+  border-radius: 4px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

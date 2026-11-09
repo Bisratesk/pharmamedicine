@@ -1,0 +1,42 @@
+
+<section>
+  <h3>Medicine stock</h3>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <input placeholder="Medicine name" formControlName="medicineName" />
+    <label>Price <input type="number" step="0.01" formControlName="price" /></label>
+    <label>Quantity <input type="number" formControlName="quantity" /></label>
+
+    <div class="actions">
+      <button type="submit" [disabled]="form.invalid || saving()">
+        {{ editingId() === null ? 'Add medicine' : 'Save changes' }}
+      </button>
+      @if (editingId() !== null) {
+        <button type="button" class="secondary" (click)="cancel()">Cancel</button>
+      }
+    </div>
+  </form>
+
+  @if (items().length === 0) {
+    <p>No medicines in stock yet.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr><th>Medicine</th><th>Price</th><th>Qty</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (item of items(); track item.id) {
+          <tr>
+            <td>{{ item.medicineName }}</td>
+            <td>{{ item.price }}</td>
+            <td [class.low]="item.quantity < 5">{{ item.quantity }}</td>
+            <td>
+              <button type="button" (click)="edit(item)">Edit</button>
+              <button type="button" class="danger" (click)="remove(item.id)">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

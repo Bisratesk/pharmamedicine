@@ -1,2 +1,41 @@
-<p>owner-dashboard works!</p>
-<h2>Owner Dashboard</h2>
+<h2>My pharmacy</h2>
+
+@if (loadingPharmacy()) {
+  <p>Loading...</p>
+} @else if (pharmacy(); as p) {
+  <div class="card">
+    <h3>{{ p.name }}</h3>
+    <p>Status: <span class="status" [class]="p.status">{{ p.status }}</span></p>
+    <p>Address: {{ p.address }}</p>
+    <p>Phone: {{ p.phone }}</p>
+    <p>License: {{ p.licenseNumber }}</p>
+    <p>Hours: {{ p.openingTime }} - {{ p.closingTime }}</p>
+    @if (p.status === 'Approved') {
+  <app-stockmanagment [pharmacyId]="p.id" />
+} @else if (p.status === 'Pending') {
+  <p class="notice">Your pharmacy is waiting for admin approval. You can add medicines once it's approved.</p>
+} @else {
+  <p class="notice">Your pharmacy was rejected. Contact the administrator.</p>
+}
+  </div>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <h3>Register your pharmacy</h3>
+
+    <input placeholder="Pharmacy name" formControlName="name" />
+    <input placeholder="Address" formControlName="address" />
+    <input placeholder="Phone" formControlName="phone" />
+    <input placeholder="License number" formControlName="licenseNumber" />
+
+    <label>Opens <input type="time" formControlName="openingTime" /></label>
+    <label>Closes <input type="time" formControlName="closingTime" /></label>
+
+    @if (error()) {
+      <small>{{ error() }}</small>
+    }
+
+    <button type="submit" [disabled]="form.invalid || saving()">
+      {{ saving() ? 'Saving...' : 'Register pharmacy' }}
+    </button>
+  </form>
+}

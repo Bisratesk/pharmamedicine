@@ -1,1 +1,74 @@
-<h2>find medicine</h2>
+<h2>Find medicine</h2>
+<div class="prescription">
+  <label class="upload">
+    Upload prescription
+    <input type="file" accept="image/*" (change)="onFileChosen($event)" />
+  </label>
+
+  @if (previewUrl()) {
+    <img [src]="previewUrl()" alt="Prescription preview" />
+  }
+
+  @if (uploading()) {
+    <p>Reading prescription...</p>
+  }
+
+  @if (detected().length > 0) {
+    <p>Medicines found. Tap one to search:</p>
+    <div class="chips">
+      @for (name of detected(); track name) {
+        <button type="button" (click)="searchFor(name)">{{ name }}</button>
+      }
+    </div>
+  }
+</div>
+<div class="search-bar">
+  <input
+    placeholder="Search a medicine, e.g. Paracetamol"
+    [formControl]="term"
+    (keyup.enter)="search()"
+  />
+  <button (click)="search()" [disabled]="loading()">
+    {{ loading() ? 'Searching...' : 'Search' }}
+  </button>
+</div>
+
+@if (results().length > 0) {
+  <div class="filters">
+    <label>
+      Min price
+      <input #min type="number" placeholder="Any" (input)="setMinPrice(min.value)" />
+    </label>
+
+    <label>
+      Max price
+      <input #max type="number" placeholder="Any" (input)="setMaxPrice(max.value)" />
+    </label>
+
+    <label>
+      Sort by
+      <select #sort (change)="setSort(sort.value)">
+        <option value="none">Default</option>
+        <option value="priceAsc">Price: low to high</option>
+        <option value="priceDesc">Price: high to low</option>
+      </select>
+    </label>
+  </div>
+}
+
+@if (results().length > 0 && filtered().length === 0) {
+  <p class="empty">No results match your filters.</p>
+}
+@if (searched() && results().length === 0) {
+  <p class="empty">No pharmacy has that medicine in stock.</p>
+}
+
+@for (r of filtered(); track r.pharmacyId + r.medicineName) {
+  <div class="result">
+    <h3>{{ r.medicineName }}</h3>
+    <p class="price">{{ r.price }} ETB</p>
+    <p>{{ r.pharmacyName }} · {{ r.address }}</p>
+    <p>Phone: {{ r.phone }}</p>
+    <p>{{ r.quantity }} in stock</p>
+  </div>
+}
