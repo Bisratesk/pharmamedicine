@@ -9,7 +9,6 @@
     <p>Address: {{ p.address }}</p>
     <p>Phone: {{ p.phone }}</p>
     <p>License: {{ p.licenseNumber }}</p>
-    <p>Location: {{ p.latitude }}, {{ p.longitude }}</p>
     <p>Hours: {{ p.openingTime }} - {{ p.closingTime }}</p>
     @if (p.status === 'Approved') {
   <app-stockmanagment [pharmacyId]="p.id" />
@@ -27,7 +26,12 @@
     <input placeholder="Address" formControlName="address" />
     <input placeholder="Phone" formControlName="phone" />
     <input placeholder="License number" formControlName="licenseNumber" />
-    <label>Longitude <input type="number" formControlName="longitude" /></label>
+    <button type="button" class="secondary" (click)="useMyLocation()" [disabled]="locating()">
+  {{ locating() ? 'Locating...' : 'Use my current location' }}
+</button>
+@if (locationSet()) {
+  <small class="ok">Location captured ✓</small>
+}
 
     <label>Opens <input type="time" formControlName="openingTime" /></label>
     <label>Closes <input type="time" formControlName="closingTime" /></label>

@@ -85,3 +85,12 @@ button:disabled { background: #aaa; cursor: not-allowed; }
     padding: 0 12px;
   }
 }
+.location {
+  display: flex;
+  align-items: flex-end;
+}
+
+.distance {
+  color: #2a7de1;
+  font-weight: bold;
+}

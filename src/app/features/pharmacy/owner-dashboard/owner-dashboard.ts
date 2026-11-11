@@ -14,6 +14,8 @@ export class OwnerDashboard {pharmacy = signal<Pharmacy | null>(null);
 loadingPharmacy = signal(true);
 saving = signal(false);
 error = signal('');
+locating = signal(false);
+locationSet = signal(false);
 form;
 
 constructor(private fb: FormBuilder, private pharmacyService: PharmacyService) {
@@ -36,7 +38,8 @@ constructor(private fb: FormBuilder, private pharmacyService: PharmacyService) {
 }
 
 submit() {
-  if (this.form.invalid) return;
+  
+  if (this.form.invalid || !this.locationSet()) return;
 
   this.saving.set(true);
   this.error.set('');
@@ -55,7 +58,31 @@ submit() {
       this.saving.set(false);
       this.error.set(err.message);
     },
-  });
+  });}
+  useMyLocation() {
+  if (!navigator.geolocation) {
+    this.error.set('Your browser does not support location.');
+    return;
+  }
+
+  this.locating.set(true);
+  this.error.set('');
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      this.form.patchValue({
+        latitude: Number(pos.coords.latitude.toFixed(6)),
+        longitude: Number(pos.coords.longitude.toFixed(6)),
+      });
+      this.locationSet.set(true);
+      this.locating.set(false);
+    },
+    () => {
+      this.error.set('Could not get your location. Please allow location access.');
+      this.locating.set(false);
+    } //: it asks the browser for the position, fills the two hidden form fields, and marks the location as captured.
+  );
 }
 
 }
+

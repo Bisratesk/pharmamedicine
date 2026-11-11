@@ -36,6 +36,7 @@
 @if (results().length > 0) {
   <div class="filters">
 
+
     <label>
       Max price
       <input #max type="number" placeholder="Any" (input)="setMaxPrice(max.value)" />
@@ -47,8 +48,23 @@
         <option value="none">Default</option>
         <option value="priceAsc">Price: low to high</option>
         <option value="priceDesc">Price: high to low</option>
+        @if (userLocation()) {
+  <option value="nearest">Nearest first</option>
+}
       </select>
     </label>
+    <div class="location">
+  <button type="button" (click)="useMyLocation()" [disabled]="locating()">
+    {{ locating() ? 'Locating...' : userLocation() ? 'Location set' : 'Use my location' }}
+  </button>
+</div>
+
+@if (userLocation()) {
+  <label>
+    Max distance (km)
+    <input #dist type="number" placeholder="Any" (input)="setMaxDistance(dist.value)" />
+  </label>
+}
   </div>
 }
 
@@ -66,5 +82,11 @@
     <p>{{ r.pharmacyName }} · {{ r.address }}</p>
     <p>Phone: {{ r.phone }}</p>
     <p>{{ r.quantity }} in stock</p>
+    @if (r.distanceKm !== null) {
+  <p class="distance">{{ r.distanceKm.toFixed(1) }} km away</p>
+}
   </div>
+  @if (locationError()) {
+  <p class="empty">{{ locationError() }}</p>
+}
 }
