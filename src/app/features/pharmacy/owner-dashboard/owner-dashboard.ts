@@ -41,8 +41,8 @@ submit() {
   
   if (this.form.invalid || !this.locationSet()) return;
 
-  this.saving.set(true);
-  this.error.set('');
+  this.saving.set(true);//starts the saving spinner and disables the submit button.
+  this.error.set('');//clears any previous error message.
 
   const payload = this.form.getRawValue();
 
@@ -73,9 +73,9 @@ submit() {
       this.form.patchValue({
         latitude: Number(pos.coords.latitude.toFixed(6)),
         longitude: Number(pos.coords.longitude.toFixed(6)),
-      });
-      this.locationSet.set(true);
-      this.locating.set(false);
+      });//the browser fills the two hidden form fields with the user's current latitude and longitude, rounded to 6 decimal places.
+      this.locationSet.set(true);//marks the location as captured.
+      this.locating.set(false);//stops the locating spinner.
     },
     () => {
       this.error.set('Could not get your location. Please allow location access.');
