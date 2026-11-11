@@ -6,4 +6,6 @@ export interface SearchResult {
   medicineName: string;
   price: number;
   quantity: number;
+  longitude: number;
+  latitude: number;
 }

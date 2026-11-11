@@ -76,3 +76,12 @@ button:disabled { background: #aaa; cursor: not-allowed; }
   flex-wrap: wrap;
   gap: 8px;
 }
+@media (max-width: 600px) {
+  .filters {
+    flex-direction: column;
+  }
+
+  .search-bar {
+    padding: 0 12px;
+  }
+}

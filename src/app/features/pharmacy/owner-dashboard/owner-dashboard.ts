@@ -24,6 +24,8 @@ constructor(private fb: FormBuilder, private pharmacyService: PharmacyService) {
     licenseNumber: ['', Validators.required],
     openingTime: ['08:00', Validators.required],
     closingTime: ['20:00', Validators.required],
+    longitude: [0, [Validators.required, Validators.min(-180), Validators.max(180)]],
+    latitude: [0, [Validators.required, Validators.min(-90), Validators.max(90)]],
    
   });
 

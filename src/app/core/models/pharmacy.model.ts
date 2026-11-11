@@ -10,6 +10,8 @@ export interface Pharmacy {
   openingTime: string;
   closingTime: string;
   status: PharmacyStatus;
+  longitude: number;
+  latitude: number;
 }
 
 export type PharmacyRequest = Omit<Pharmacy, 'id' | 'ownerId' | 'status'>;

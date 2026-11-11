@@ -1,10 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { PharmacyService } from '../../../core/services/pharmacy';
 import { Pharmacy, PharmacyStatus } from '../../../core/models/pharmacy.model';
+import { MedicineManager } from '../medicine-manager/medicine-manager';
+import { ActivityLog } from '../activity-log/activity-log';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [],
+  imports: [MedicineManager,ActivityLog],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })

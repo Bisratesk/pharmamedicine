@@ -1,0 +1,36 @@
+
+<section>
+  <h3>Medicine database</h3>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <input placeholder="Medicine name" formControlName="name" />
+    <input placeholder="Category (e.g. Antibiotic)" formControlName="category" />
+    <div class="actions">
+  <button type="submit" [disabled]="form.invalid">
+    {{ editingId() === null ? 'Add medicine' : 'Save changes' }}
+  </button>
+  @if (editingId() !== null) {
+    <button type="button" class="secondary" (click)="cancel()">Cancel</button>
+  }
+</div>
+  </form>
+
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Category</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (m of medicines(); track m.id) {
+        <tr>
+          <td>{{ m.name }}</td>
+          <td>{{ m.category }}</td>
+          
+        <td>
+  <button type="button" (click)="edit(m)">Edit</button>
+  <button type="button" class="danger" (click)="remove(m.id)">Delete</button>
+</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>

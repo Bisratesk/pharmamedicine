@@ -12,11 +12,17 @@
       <p>Phone: {{ p.phone }}</p>
       <p>License: {{ p.licenseNumber }}</p>
       <p>Hours: {{ p.openingTime }} - {{ p.closingTime }}</p>
-
+      <p>Latitude: {{ p.latitude }}</p>
+      <p>Longitude: {{ p.longitude }}</p>
+      <label>Latitude <input type="number" formControlName="latitude" /></label>
+<label>Longitude <input type="number" formControlName="longitude" /></label>
       <div class="actions">
         <button class="approve" (click)="decide(p.id, 'Approved')">Approve</button>
         <button class="reject" (click)="decide(p.id, 'Rejected')">Reject</button>
       </div>
     </div>
+  
   }
 }
+  <app-medicine-manager />
+  <app-activity-log />

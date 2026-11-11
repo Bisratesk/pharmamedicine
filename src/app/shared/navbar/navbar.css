@@ -22,3 +22,14 @@ nav button {
   border-radius: 4px;
   cursor: pointer;
 }
+@media (max-width: 600px) {
+  nav {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  nav span {
+    margin-left: 0;
+    width: 100%;
+  }
+}

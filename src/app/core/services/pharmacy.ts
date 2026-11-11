@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { Observable, of, delay, throwError } from 'rxjs';
 import { Pharmacy, PharmacyRequest, PharmacyStatus } from '../models/pharmacy.model';
 import { AuthService } from './auth';
+import { ActivityService } from './activity';
 
 @Injectable({ providedIn: 'root' })
 export class PharmacyService {
   private pharmacies: Pharmacy[] = [];
 
-  constructor(private auth: AuthService) {}
+    constructor(private auth: AuthService, private activity: ActivityService) {}
 
   register(req: PharmacyRequest): Observable<Pharmacy> {
     const user = this.auth.currentUser();
@@ -20,7 +21,9 @@ export class PharmacyService {
       status: 'Pending',
     };
     this.pharmacies.push(pharmacy);
+    this.activity.log(`${pharmacy.name} registered (Pending)`);
     return of(pharmacy).pipe(delay(500));
+    
   }
 
   getMine(): Observable<Pharmacy | null> {
@@ -42,9 +45,12 @@ setStatus(id: number, status: PharmacyStatus): Observable<Pharmacy> { //finds on
   if (!pharmacy) return throwError(() => new Error('Pharmacy not found'));
 
   pharmacy.status = status;
+  this.activity.log(`${pharmacy.name} was ${status}`);
   return of(pharmacy).pipe(delay(300));
 }
 getById(id: number): Pharmacy | undefined {
   return this.pharmacies.find(p => p.id === id);
 }
 }
+
+export type { Pharmacy };
