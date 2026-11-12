@@ -1,36 +1,42 @@
-
 <section>
-  <h3>Medicine database</h3>
+  <div class="header">
+    <h3>Medicines in pharmacies</h3>
+    <button type="button" (click)="load()">Refresh</button>
+  </div>
 
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <input placeholder="Medicine name" formControlName="name" />
-    <input placeholder="Category (e.g. Antibiotic)" formControlName="category" />
-    <div class="actions">
-  <button type="submit" [disabled]="form.invalid">
-    {{ editingId() === null ? 'Add medicine' : 'Save changes' }}
-  </button>
   @if (editingId() !== null) {
-    <button type="button" class="secondary" (click)="cancel()">Cancel</button>
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <input placeholder="Medicine name" formControlName="medicineName" />
+      <label>Price <input type="number" step="0.01" formControlName="price" /></label>
+      <label>Quantity <input type="number" formControlName="quantity" /></label>
+      <div class="actions">
+        <button type="submit" [disabled]="form.invalid">Save changes</button>
+        <button type="button" class="secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
   }
-</div>
-  </form>
 
-  <table>
-    <thead>
-      <tr><th>Name</th><th>Category</th><th></th></tr>
-    </thead>
-    <tbody>
-      @for (m of medicines(); track m.id) {
-        <tr>
-          <td>{{ m.name }}</td>
-          <td>{{ m.category }}</td>
-          
-        <td>
-  <button type="button" (click)="edit(m)">Edit</button>
-  <button type="button" class="danger" (click)="remove(m.id)">Delete</button>
-</td>
-        </tr>
-      }
-    </tbody>
-  </table>
+  @if (items().length === 0) {
+    <p>No pharmacy has added medicines yet.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr><th>Medicine</th><th>Pharmacy</th><th>Price</th><th>Qty</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (m of items(); track m.id) {
+          <tr>
+            <td>{{ m.medicineName }}</td>
+            <td>{{ m.pharmacyName }}</td>
+            <td>{{ m.price }}</td>
+            <td>{{ m.quantity }}</td>
+            <td>
+              <button type="button" (click)="edit(m)">Edit</button>
+              <button type="button" class="danger" (click)="remove(m.id)">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
 </section>

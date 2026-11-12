@@ -1,7 +1,7 @@
 import { Component,signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MedicineService } from '../../../core/services/medicine';
-import { Medicine } from '../../../core/models/medicine.model';
+import { StockService } from '../../../core/services/stock';
+import { AdminStockRow } from '../../../core/models/stock.model';
 
 @Component({
   imports: [ReactiveFormsModule],
@@ -10,38 +10,40 @@ import { Medicine } from '../../../core/models/medicine.model';
   templateUrl: './medicine-manager.html',
 })
 export class MedicineManager {
-  medicines = signal<Medicine[]>([]);
-  editingId = signal<number | null>(null);
+items = signal<AdminStockRow[]>([]);
+editingId = signal<number | null>(null);
 form;
 
-constructor(private fb: FormBuilder, private service: MedicineService) {
+constructor(private fb: FormBuilder, private stock: StockService) {
   this.form = this.fb.nonNullable.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
-    category: ['', Validators.required],
+    medicineName: ['', [Validators.required, Validators.minLength(2)]],
+    price: [0, [Validators.required, Validators.min(0.01)]],
+    quantity: [0, [Validators.required, Validators.min(0)]],
   });
   this.load();
 }
 
 load() {
-  this.service.getAll().subscribe(list => this.medicines.set(list));
+  this.stock.getAll().subscribe(list => this.items.set(list));
 }
 
-submit() {
-  if (this.form.invalid) return;
-
-  const id = this.editingId();
-  const req = this.form.getRawValue();
-  const call = id === null ? this.service.add(req) : this.service.update(id, req);
-
-  call.subscribe(() => {
-    this.form.reset();
-    this.editingId.set(null);
-    this.load();
+edit(row: AdminStockRow) {
+  this.editingId.set(row.id);
+  this.form.patchValue({
+    medicineName: row.medicineName,
+    price: row.price,
+    quantity: row.quantity,
   });
 }
-edit(m: Medicine) {
-  this.editingId.set(m.id);
-  this.form.patchValue({ name: m.name, category: m.category });
+
+save() {
+  const id = this.editingId();
+  if (id === null || this.form.invalid) return;
+
+  this.stock.update(id, this.form.getRawValue()).subscribe(() => {
+    this.cancel();
+    this.load();
+  });
 }
 
 cancel() {
@@ -50,6 +52,5 @@ cancel() {
 }
 
 remove(id: number) {
-  this.service.remove(id).subscribe(() => this.load());
-}
-}
+  this.stock.remove(id).subscribe(() => this.load());
+}}

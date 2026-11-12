@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, delay, throwError } from 'rxjs';
-import { StockItem, StockRequest } from '../models/stock.model';
+import { StockItem, StockRequest,AdminStockRow } from '../models/stock.model';
 import {PharmacyService, } from './pharmacy';
 import { SearchResult } from '../models/search.model';
 import { ActivityService } from './activity';
+
 
 @Injectable({ providedIn: 'root' })
 export class StockService {
@@ -47,6 +48,13 @@ export class StockService {
   }
   this.items = this.items.filter(i => i.id !== id);
   return of(undefined).pipe(delay(300));
+}
+getAll(): Observable<AdminStockRow[]> {
+  const rows = this.items.map(i => ({
+    ...i,
+    pharmacyName: this.pharmacies.getById(i.pharmacyId)?.name ?? 'Unknown',
+  }));
+  return of(rows).pipe(delay(300));
 }
   search(term: string): Observable<SearchResult[]> {
   const text = term.trim().toLowerCase();
