@@ -1,15 +1,55 @@
-<nav>
-  <strong>medicine Finder</strong>
 
-@if (auth.currentUser()) {
-  @if (auth.currentUser()?.role === 'Admin') {
-    <a routerLink="/admin">Dashboard</a>
+<nav class="navbar">
+
+  <!-- Brand -->
+  <a class="brand" routerLink="/">
+    <span class="brand-icon">P</span>
+    <span>Pharmacy Finder</span>
+  </a>
+
+  @if (auth.currentUser()) {
+
+    <!-- Navigation Links -->
+    <div class="nav-links">
+
+      @if (auth.currentUser()?.role === 'Admin') {
+        <a routerLink="/admin" routerLinkActive="active">
+          Dashboard
+        </a>
+      }
+
+      @if (auth.currentUser()?.role === 'PharmacyOwner') {
+        <a routerLink="/owner" routerLinkActive="active">
+          My Pharmacy
+        </a>
+      }
+
+      <a routerLink="/search" routerLinkActive="active">
+        Find Medicine
+      </a>
+
+    </div>
+
+    <!-- User Profile and Logout -->
+    <div class="nav-actions">
+
+      <div class="user-profile">
+        <div class="user-avatar">
+          {{ auth.currentUser()?.fullName?.charAt(0) }}
+        </div>
+
+        <div class="user-info">
+          <strong>{{ auth.currentUser()?.fullName }}</strong>
+          <span>{{ auth.currentUser()?.role }}</span>
+        </div>
+      </div>
+
+      <button class="logout-button" (click)="logout()">
+        Logout
+      </button>
+
+    </div>
+
   }
-  @if (auth.currentUser()?.role === 'PharmacyOwner') {
-  <a routerLink="/owner">My pharmacy</a>
-}
-  <a routerLink="/search">Find medicine</a>
 
-  <span>{{ auth.currentUser()?.fullName }} ({{ auth.currentUser()?.role }})</span>
-  <button (click)="logout()">Logout</button>
-}
+</nav>

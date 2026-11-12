@@ -1,92 +1,219 @@
-<h2>Find medicine</h2>
-<div class="prescription">
-  <label class="upload">
-    Upload prescription
-    <input type="file" accept="image/*" (change)="onFileChosen($event)" />
-  </label>
 
-  @if (previewUrl()) {
-    <img [src]="previewUrl()" alt="Prescription preview" />
-  }
+<div class="customer-dashboard">
 
-  @if (uploading()) {
-    <p>Reading prescription...</p>
-  }
-
-  @if (detected().length > 0) {
-    <p>Medicines found. Tap one to search:</p>
-    <div class="chips">
-      @for (name of detected(); track name) {
-        <button type="button" (click)="searchFor(name)">{{ name }}</button>
-      }
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>Find Your Medicine</h1>
+      <p>Search for medicines and find pharmacies where they are available.</p>
     </div>
-  }
-</div>
-<div class="search-bar">
-  <input
-    placeholder="Search a medicine, e.g. Paracetamol"
-    [formControl]="term"
-    (keyup.enter)="search()"
-  />
-  <button (click)="search()" [disabled]="loading()">
-    {{ loading() ? 'Searching...' : 'Search' }}
-  </button>
-</div>
+    <span class="page-tag">Medicine Finder</span>
+  </div>
 
-@if (results().length > 0) {
-  <div class="filters">
+  <!-- Search Section -->
+  <section class="search-section">
 
+    <div class="search-heading">
+      <h2>Search Medicines</h2>
+      <p>Enter a medicine name to find nearby pharmacies.</p>
+    </div>
 
-    <label>
-      Max price
-      <input #max type="number" placeholder="Any" (input)="setMaxPrice(max.value)" />
+    <div class="search-bar">
+      <input
+        placeholder="Search a medicine, e.g. Paracetamol"
+        [formControl]="term"
+        (keyup.enter)="search()"
+      />
+
+      <button (click)="search()" [disabled]="loading()">
+        {{ loading() ? 'Searching...' : 'Search Medicine' }}
+      </button>
+    </div>
+
+  </section>
+
+  <!-- Prescription Upload -->
+  <section class="prescription-section">
+
+    <div class="prescription-info">
+      <div class="prescription-icon">+</div>
+      <div>
+        <h2>Search Using Prescription</h2>
+        <p>Upload a prescription to identify medicines automatically.</p>
+      </div>
+    </div>
+
+    <label class="upload">
+      <span>Upload Prescription</span>
+      <span class="upload-hint">Choose an image from your device</span>
+      <input
+        type="file"
+        accept="image/*"
+        (change)="onFileChosen($event)"
+      />
     </label>
 
-    <label>
-      Sort by
-      <select #sort (change)="setSort(sort.value)">
-        <option value="none">Default</option>
-        <option value="priceAsc">Price: low to high</option>
-        <option value="priceDesc">Price: high to low</option>
-        @if (userLocation()) {
-  <option value="nearest">Nearest first</option>
-}
-      </select>
-    </label>
-    <div class="location">
-  <button type="button" (click)="useMyLocation()" [disabled]="locating()">
-    {{ locating() ? 'Locating...' : userLocation() ? 'Location set' : 'Use my location' }}
-  </button>
+    @if (previewUrl()) {
+      <div class="preview-container">
+        <img [src]="previewUrl()" alt="Prescription preview" />
+      </div>
+    }
+
+    @if (uploading()) {
+      <p class="loading-message">Reading prescription...</p>
+    }
+
+    @if (detected().length > 0) {
+      <div class="detected-section">
+        <h3>Detected Medicines</h3>
+        <p>Select a medicine to search for available pharmacies.</p>
+
+        <div class="chips">
+          @for (name of detected(); track name) {
+            <button type="button" (click)="searchFor(name)">
+              {{ name }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+  </section>
+
+  <!-- Search Results -->
+  <section class="results-section">
+
+    <div class="results-header">
+      <div>
+        <h2>Available Pharmacies</h2>
+        <p>Find pharmacies that have your requested medicine in stock.</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+
+      <label>
+        Maximum Price (ETB)
+        <input
+          #max
+          type="number"
+          min="0"
+          placeholder="Any price"
+          (input)="setMaxPrice(max.value)"
+        />
+      </label>
+
+      <label>
+        Sort Results
+        <select #sort (change)="setSort(sort.value)">
+          <option value="none">Default</option>
+          <option value="priceAsc">Price: Low to High</option>
+          <option value="priceDesc">Price: High to Low</option>
+          @if (userLocation()) {
+            <option value="nearest">Nearest First</option>
+          }
+        </select>
+      </label>
+
+      <div class="location">
+        <button
+          type="button"
+          (click)="useMyLocation()"
+          [disabled]="locating()">
+          {{ locating() ? 'Locating...' : userLocation() ? 'Location Set ✓' : '◎ Use My Location' }}
+        </button>
+      </div>
+
+      @if (userLocation()) {
+        <label>
+          Maximum Distance (KM)
+          <input
+            #dist
+            type="number"
+            min="0"
+            placeholder="Any distance"
+            (input)="setMaxDistance(dist.value)"
+          />
+        </label>
+      }
+
+    </div>
+
+    @if (locationError()) {
+      <p class="empty">{{ locationError() }}</p>
+    }
+
+    @if (results().length > 0 && filtered().length === 0) {
+      <div class="empty-state">
+        <h3>No matching pharmacies</h3>
+        <p>Try adjusting your price or distance filters.</p>
+      </div>
+    }
+
+    @if (searched() && results().length === 0) {
+      <div class="empty-state">
+        <h3>No pharmacies found</h3>
+        <p>We couldn't find this medicine in any pharmacy. Try another medicine name.</p>
+      </div>
+    }
+
+    <!-- Pharmacy Cards -->
+    <div class="results-grid">
+
+      @for (r of filtered(); track r.pharmacyId + r.medicineName) {
+
+        <div class="result-card">
+
+          <div class="result-top">
+            <div>
+              <span class="availability">Available</span>
+              <h3>{{ r.medicineName }}</h3>
+            </div>
+
+            <div class="price">
+              <strong>{{ r.price }}</strong>
+              <span>ETB</span>
+            </div>
+          </div>
+
+          <div class="result-divider"></div>
+
+          <div class="pharmacy-details">
+            <div>
+              <span class="detail-label">Pharmacy</span>
+              <strong>{{ r.pharmacyName }}</strong>
+            </div>
+
+            <div>
+              <span class="detail-label">Address</span>
+              <strong>{{ r.address }}</strong>
+            </div>
+
+            <div>
+              <span class="detail-label">Contact</span>
+              <strong>{{ r.phone }}</strong>
+            </div>
+          </div>
+
+          <div class="result-footer">
+            <span class="stock">
+              {{ r.quantity }} in stock
+            </span>
+
+            @if (r.distanceKm !== null) {
+              <span class="distance">
+                {{ r.distanceKm.toFixed(1) }} km away
+              </span>
+            }
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </section>
+
 </div>
-
-@if (userLocation()) {
-  <label>
-    Max distance (km)
-    <input #dist type="number" placeholder="Any" (input)="setMaxDistance(dist.value)" />
-  </label>
-}
-  </div>
-}
-
-@if (results().length > 0 && filtered().length === 0) {
-  <p class="empty">No results match your filters.</p>
-}
-@if (searched() && results().length === 0) {
-  <p class="empty">No pharmacy has that medicine in stock.</p>
-}
-
-@for (r of filtered(); track r.pharmacyId + r.medicineName) {
-  <div class="result">
-    <h3>{{ r.medicineName }}</h3>
-    <p class="price">{{ r.price }} ETB</p>
-    <p>{{ r.pharmacyName }} · {{ r.address }}</p>
-    <p>Phone: {{ r.phone }}</p>
-    <p>{{ r.quantity }} in stock</p>
-    @if (r.distanceKm !== null) {
-  <p class="distance">{{ r.distanceKm.toFixed(1) }} km away</p>
-}
-  </div>
-  @if (locationError()) {
-  <p class="empty">{{ locationError() }}</p>
-}
-}

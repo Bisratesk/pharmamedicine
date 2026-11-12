@@ -1,96 +1,508 @@
+
+/* Main Layout */
+.customer-dashboard {
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 35px 40px;
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+
+.page-header p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.page-tag {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 9px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Search Section */
+.search-section,
+.prescription-section,
+.results-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 26px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+.search-heading h2,
+.results-header h2 {
+  font-size: 19px;
+  color: #0f172a;
+  margin: 0 0 7px;
+}
+
+.search-heading p,
+.results-header p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 20px;
+}
+
 .search-bar {
   display: flex;
-  gap: 8px;
-  max-width: 520px;
-  margin: 24px auto;
+  gap: 12px;
 }
 
 .search-bar input {
   flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  min-width: 0;
+  padding: 13px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  font-size: 14px;
+  outline: none;
 }
 
-button {
-  padding: 10px 16px;
-  background: #2a7de1;
+.search-bar input:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.search-bar button {
+  padding: 12px 24px;
+  background: #0284c7;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
 }
 
-button:disabled { background: #aaa; cursor: not-allowed; }
-
-.result {
-  max-width: 520px;
-  margin: 12px auto;
-  padding: 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+.search-bar button:hover:not(:disabled) {
+  background: #0369a1;
 }
 
-.price { font-weight: bold; color: #1e8e3e; }
-.empty { text-align: center; color: #666; }
+.search-bar button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
 
-.filters {
+/* Prescription Section */
+.prescription-section {
+  background: #fcfdff;
+}
+
+.prescription-info {
   display: flex;
-  gap: 16px;
-  max-width: 520px;
-  margin: 0 auto 8px;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
-.filters label {
+.prescription-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #e0f2fe;
+  color: #0284c7;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.prescription-info h2 {
+  font-size: 17px;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.prescription-info p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.upload {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 7px;
+  padding: 25px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 9px;
+  background: #f8fafc;
+  text-align: center;
+  cursor: pointer;
+  color: #0369a1;
   font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
 }
 
-.filters input,
-.filters select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.upload:hover {
+  border-color: #0284c7;
+  background: #f0f9ff;
 }
 
-.prescription {
-  max-width: 520px;
-  margin: 16px auto;
-  padding: 16px;
-  border: 1px dashed #aaa;
+.upload-hint {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.upload input {
+  display: none;
+}
+
+.preview-container {
+  margin-top: 18px;
+}
+
+.preview-container img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
 }
 
-.prescription img {
-  display: block;
-  max-width: 100%;
-  max-height: 220px;
-  margin: 12px 0;
-  border-radius: 4px;
+.loading-message {
+  color: #0284c7;
+  font-size: 13px;
+  margin-top: 15px;
+}
+
+/* Detected Medicines */
+.detected-section {
+  margin-top: 22px;
+}
+
+.detected-section h3 {
+  font-size: 15px;
+  margin: 0 0 6px;
+}
+
+.detected-section p {
+  font-size: 13px;
+  color: #64748b;
 }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
-@media (max-width: 600px) {
-  .filters {
-    flex-direction: column;
-  }
 
-  .search-bar {
-    padding: 0 12px;
-  }
+.chips button {
+  padding: 9px 15px;
+  border: 1px solid #bae6fd;
+  border-radius: 20px;
+  background: #f0f9ff;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }
-.location {
+
+.chips button:hover {
+  background: #0284c7;
+  color: white;
+}
+
+/* Results */
+.results-section {
+  min-height: 200px;
+}
+
+.results-header {
+  margin-bottom: 20px;
+}
+
+/* Filters */
+.filters {
   display: flex;
-  align-items: flex-end;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 18px;
+  padding: 18px;
+  margin-bottom: 22px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 150px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.filters input,
+.filters select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  color: #334155;
+  font-size: 13px;
+  outline: none;
+}
+
+.filters input:focus,
+.filters select:focus {
+  border-color: #0284c7;
+}
+
+.location button {
+  padding: 11px 15px;
+  border: 1px solid #0284c7;
+  border-radius: 6px;
+  background: #f0f9ff;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.location button:hover {
+  background: #e0f2fe;
+}
+
+.location button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Result Cards */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.result-card {
+  padding: 21px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  transition: 0.2s ease;
+}
+
+.result-card:hover {
+  border-color: #7dd3fc;
+  box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
+}
+
+.result-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.availability {
+  display: inline-block;
+  margin-bottom: 9px;
+  padding: 5px 9px;
+  border-radius: 15px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.result-top h3 {
+  font-size: 17px;
+  color: #0f172a;
+  margin: 0;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  color: #0284c7;
+  white-space: nowrap;
+}
+
+.price strong {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.price span {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.result-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 18px 0;
+}
+
+/* Pharmacy Details */
+.pharmacy-details {
+  display: grid;
+  gap: 14px;
+}
+
+.pharmacy-details > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-label {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.pharmacy-details strong {
+  font-size: 13px;
+  color: #334155;
+  font-weight: 500;
+}
+
+/* Result Footer */
+.result-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.stock {
+  background: #f0fdf4;
+  color: #15803d;
+  padding: 7px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .distance {
-  color: #2a7de1;
-  font-weight: bold;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Empty States */
+.empty-state {
+  padding: 35px 20px;
+  text-align: center;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 9px;
+}
+
+.empty-state h3 {
+  font-size: 15px;
+  color: #334155;
+  margin: 0 0 8px;
+}
+
+.empty-state p,
+.empty {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.empty {
+  padding: 12px;
+  background: #fff7ed;
+  border-radius: 7px;
+}
+
+/* Responsive */
+@media (max-width: 850px) {
+  .customer-dashboard {
+    padding: 25px 20px;
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .customer-dashboard {
+    padding: 18px 12px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 23px;
+  }
+
+  .page-tag {
+    font-size: 10px;
+    padding: 7px 10px;
+  }
+
+  .search-section,
+  .prescription-section,
+  .results-section {
+    padding: 17px;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .search-bar button {
+    width: 100%;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters label {
+    width: 100%;
+  }
+
+  .location button {
+    width: 100%;
+  }
+
+  .result-top h3 {
+    font-size: 15px;
+  }
 }

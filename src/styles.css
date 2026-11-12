@@ -5,9 +5,25 @@
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
 }
 
 img {
   max-width: 100%;
+}
+:root {
+  --primary: #0f766e;
+  --primary-dark: #0b5a54;
+  --success: #1e8e3e;
+  --danger: #d93025;
+  --warning: #e89b00;
+  --bg: #f4f7f6;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }

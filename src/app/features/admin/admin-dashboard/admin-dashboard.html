@@ -1,27 +1,118 @@
-<h2>Pending pharmacies</h2>
 
-@if (loading()) {
-  <p>Loading...</p>
-} @else if (pending().length === 0) {
-  <p>No pharmacies waiting for approval.</p>
-} @else {
-  @for (p of pending(); track p.id) {
-    <div class="card">
-      <h3>{{ p.name }}</h3>
-      <p>Address: {{ p.address }}</p>
-      <p>Phone: {{ p.phone }}</p>
-      <p>License: {{ p.licenseNumber }}</p>
-      <p>Hours: {{ p.openingTime }} - {{ p.closingTime }}</p>
-      <p>Latitude: {{ p.latitude }}</p>
-      <p>Longitude: {{ p.longitude }}</p>
+<div class="admin-dashboard">
 
-      <div class="actions">
-        <button class="approve" (click)="decide(p.id, 'Approved')">Approve</button>
-        <button class="reject" (click)="decide(p.id, 'Rejected')">Reject</button>
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>Admin Dashboard</h1>
+      <p>Manage pharmacies, medicines, and platform activities.</p>
+    </div>
+    <span class="admin-badge">Administrator</span>
+  </div>
+
+  <!-- Pending Pharmacies -->
+  <section class="dashboard-section">
+
+    <div class="section-header">
+      <div>
+        <h2>Pending Pharmacies</h2>
+        <p>Review and manage pharmacy registration requests.</p>
+      </div>
+
+      <span class="count-badge">{{ pending().length }} Pending</span>
+    </div>
+
+    @if (loading()) {
+      <div class="empty-state">Loading pharmacies...</div>
+    } @else if (pending().length === 0) {
+      <div class="empty-state">
+        <h3>No pending pharmacies</h3>
+        <p>All pharmacy registration requests have been reviewed.</p>
+      </div>
+    } @else {
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Pharmacy</th>
+              <th>Contact</th>
+              <th>License</th>
+              <th>Operating Hours</th>
+              <th>Location</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (p of pending(); track p.id) {
+              <tr>
+                <td>
+                  <div class="pharmacy-name">{{ p.name }}</div>
+                  <div class="sub-text">{{ p.address }}</div>
+                </td>
+
+                <td>{{ p.phone }}</td>
+
+                <td>{{ p.licenseNumber }}</td>
+
+                <td>{{ p.openingTime }} - {{ p.closingTime }}</td>
+
+                <td>
+                  <div class="coordinates">
+                    {{ p.latitude }}, {{ p.longitude }}
+                  </div>
+                </td>
+
+                <td>
+                  <div class="actions">
+                    <button
+                      class="approve"
+                      (click)="decide(p.id, 'Approved')">
+                      Approve
+                    </button>
+
+                    <button
+                      class="reject"
+                      (click)="decide(p.id, 'Rejected')">
+                      Reject
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <!-- Medicine Management -->
+  <section class="dashboard-section">
+    <div class="section-header">
+      <div>
+        <h2>Medicine Management</h2>
+        <p>Manage the medicines available on the platform.</p>
       </div>
     </div>
-  
-  }
-}
-  <app-medicine-manager />
-  <app-activity-log />
+
+    <div class="component-container">
+      <app-medicine-manager />
+    </div>
+  </section>
+
+  <!-- Activity Log -->
+  <section class="dashboard-section">
+    <div class="section-header">
+      <div>
+        <h2>Recent Activity</h2>
+        <p>Monitor recent actions and platform updates.</p>
+      </div>
+    </div>
+
+    <div class="component-container">
+      <app-activity-log />
+    </div>
+  </section>
+
+</div>

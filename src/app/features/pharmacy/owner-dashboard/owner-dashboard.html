@@ -1,47 +1,210 @@
-<h2>My pharmacy</h2>
 
-@if (loadingPharmacy()) {
-  <p>Loading...</p>
-} @else if (pharmacy(); as p) {
-  <div class="card">
-    <h3>{{ p.name }}</h3>
-    <p>Status: <span class="status" [class]="p.status">{{ p.status }}</span></p>
-    <p>Address: {{ p.address }}</p>
-    <p>Phone: {{ p.phone }}</p>
-    <p>License: {{ p.licenseNumber }}</p>
-    <p>Hours: {{ p.openingTime }} - {{ p.closingTime }}</p>
-    @if (p.status === 'Approved') {
-  <app-stockmanagment [pharmacyId]="p.id" />
-} @else if (p.status === 'Pending') {
-  <p class="notice">Your pharmacy is waiting for admin approval. You can add medicines once it's approved.</p>
-} @else {
-  <p class="notice">Your pharmacy was rejected. Contact the administrator.</p>
-}
+<div class="owner-dashboard">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>Pharmacy Management</h1>
+      <p>Manage your pharmacy profile and medicine inventory.</p>
+    </div>
+    <span class="page-label">Pharmacy Owner</span>
   </div>
-} @else {
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <h3>Register your pharmacy</h3>
 
-    <input placeholder="Pharmacy name" formControlName="name" />
-    <input placeholder="Address" formControlName="address" />
-    <input placeholder="Phone" formControlName="phone" />
-    <input placeholder="License number" formControlName="licenseNumber" />
-    <button type="button" class="secondary" (click)="useMyLocation()" [disabled]="locating()">
-  {{ locating() ? 'Locating...' : 'Use my current location' }}
-</button>
-@if (locationSet()) {
-  <small class="ok">Location captured ✓</small>
-}
+  @if (loadingPharmacy()) {
+    <div class="dashboard-section loading-state">
+      <p>Loading pharmacy information...</p>
+    </div>
+  } @else if (pharmacy(); as p) {
 
-    <label>Opens <input type="time" formControlName="openingTime" /></label>
-    <label>Closes <input type="time" formControlName="closingTime" /></label>
+    <!-- Pharmacy Overview -->
+    <section class="dashboard-section">
 
-    @if (error()) {
-      <small>{{ error() }}</small>
+      <div class="section-header">
+        <div>
+          <h2>My Pharmacy</h2>
+          <p>View your registered pharmacy information.</p>
+        </div>
+
+        <span class="status" [class]="p.status">
+          {{ p.status }}
+        </span>
+      </div>
+
+      <div class="pharmacy-overview">
+        <div class="pharmacy-title">
+          <div class="pharmacy-icon">P</div>
+          <div>
+            <h3>{{ p.name }}</h3>
+            <span>Registered Pharmacy</span>
+          </div>
+        </div>
+
+        <div class="details-grid">
+
+          <div class="detail-item">
+            <span class="detail-label">Address</span>
+            <strong>{{ p.address }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Phone Number</span>
+            <strong>{{ p.phone }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">License Number</span>
+            <strong>{{ p.licenseNumber }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Operating Hours</span>
+            <strong>{{ p.openingTime }} - {{ p.closingTime }}</strong>
+          </div>
+
+        </div>
+      </div>
+
+      @if (p.status === 'Approved') {
+        <div class="notice approved-notice">
+          <strong>Pharmacy approved</strong>
+          <p>Your pharmacy is approved. You can now manage your medicine inventory.</p>
+        </div>
+      } @else if (p.status === 'Pending') {
+        <div class="notice pending-notice">
+          <strong>Approval pending</strong>
+          <p>Your pharmacy is waiting for administrator approval. You can manage your inventory once it is approved.</p>
+        </div>
+      } @else {
+        <div class="notice rejected-notice">
+          <strong>Registration rejected</strong>
+          <p>Your pharmacy registration was rejected. Please contact the administrator for further information.</p>
+        </div>
+      }
+
+    </section>
+
+    <!-- Stock Management -->
+    @if (p.status === 'Approved') {
+      <section class="dashboard-section">
+
+        <div class="section-header">
+          <div>
+            <h2>Medicine Inventory</h2>
+            <p>Add, update, and manage medicines in your pharmacy.</p>
+          </div>
+          <span class="inventory-label">Inventory Management</span>
+        </div>
+
+        <app-stockmanagment [pharmacyId]="p.id" />
+
+      </section>
     }
 
-    <button type="submit" [disabled]="form.invalid || saving()">
-      {{ saving() ? 'Saving...' : 'Register pharmacy' }}
-    </button>
-  </form>
-}
+  } @else {
+
+    <!-- Pharmacy Registration -->
+    <section class="dashboard-section registration-section">
+
+      <div class="section-header">
+        <div>
+          <h2>Register Your Pharmacy</h2>
+          <p>Submit your pharmacy details for administrator approval.</p>
+        </div>
+        <span class="registration-label">New Registration</span>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <div class="form-section">
+          <h3>Basic Information</h3>
+          <p>Enter your pharmacy's official details.</p>
+
+          <div class="form-grid">
+
+            <label>
+              Pharmacy Name
+              <input placeholder="Enter pharmacy name" formControlName="name" />
+            </label>
+
+            <label>
+              License Number
+              <input placeholder="Enter license number" formControlName="licenseNumber" />
+            </label>
+
+            <label>
+              Phone Number
+              <input placeholder="Enter phone number" formControlName="phone" />
+            </label>
+
+            <label>
+              Address
+              <input placeholder="Enter pharmacy address" formControlName="address" />
+            </label>
+
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Location</h3>
+          <p>Capture your pharmacy's geographical location.</p>
+
+          <button
+            type="button"
+            class="location-button"
+            (click)="useMyLocation()"
+            [disabled]="locating()">
+
+            {{ locating() ? 'Locating...' : '◎ Use my current location' }}
+
+          </button>
+
+          @if (locationSet()) {
+            <small class="location-success">Location captured successfully ✓</small>
+          }
+        </div>
+
+        <div class="form-section">
+          <h3>Operating Hours</h3>
+          <p>Specify when your pharmacy is open.</p>
+
+          <div class="form-grid">
+
+            <label>
+              Opening Time
+              <input type="time" formControlName="openingTime" />
+            </label>
+
+            <label>
+              Closing Time
+              <input type="time" formControlName="closingTime" />
+            </label>
+
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="error-message">
+            {{ error() }}
+          </div>
+        }
+
+        <div class="form-footer">
+          <p>Make sure all information is accurate before submitting.</p>
+
+          <button
+            type="submit"
+            class="submit-button"
+            [disabled]="form.invalid || saving()">
+
+            {{ saving() ? 'Submitting...' : 'Submit Registration' }}
+
+          </button>
+        </div>
+
+      </form>
+
+    </section>
+
+  }
+
+</div>
