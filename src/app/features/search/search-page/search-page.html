@@ -1,217 +1,305 @@
+<div class="search-page-container">
 
-<div class="customer-dashboard">
-
-  <!-- Page Header -->
-  <div class="page-header">
-    <div>
-      <h1>Find Your Medicine</h1>
-      <p>Search for medicines and find pharmacies where they are available.</p>
-    </div>
-    <span class="page-tag">Medicine Finder</span>
-  </div>
-
-  <!-- Search Section -->
-  <section class="search-section">
-
-    <div class="search-heading">
-      <h2>Search Medicines</h2>
-      <p>Enter a medicine name to find nearby pharmacies.</p>
+  <!-- Header Banner -->
+  <header class="search-header">
+    <div class="header-main">
+      <span class="eyebrow">MEDICINE DISCOVERY NETWORK</span>
+      <h1>Find Essential Medicines Near You</h1>
+      <p>Search licensed pharmacies, compare prices, verify real-time stock, and upload prescriptions for automatic detection.</p>
     </div>
 
-    <div class="search-bar">
-      <input
-        placeholder="Search a medicine, e.g. Paracetamol"
-        [formControl]="term"
-        (keyup.enter)="search()"
-      />
+    <div class="header-stats">
+      <div class="stat-pill">
+        <span class="pulse-indicator"></span>
+        <span>Real-Time GPS Tracking</span>
+      </div>
+    </div>
+  </header>
 
-      <button (click)="search()" [disabled]="loading()">
-        {{ loading() ? 'Searching...' : 'Search Medicine' }}
+  <!-- Main Search Box Section -->
+  <section class="search-hero-card">
+    <div class="search-input-box">
+      <div class="search-field">
+        <span class="search-glyph">🔍</span>
+        <input
+          type="text"
+          placeholder="Type medicine name (e.g. Paracetamol, Amoxicillin, Ibuprofen)..."
+          [formControl]="term"
+          (keyup.enter)="search()"
+        />
+        @if (term.value) {
+          <button type="button" class="clear-input-btn" (click)="term.setValue('')">✕</button>
+        }
+      </div>
+
+      <button type="button" class="search-action-btn" (click)="search()" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner-sm"></span>
+          <span>Searching...</span>
+        } @else {
+          <span>Find Pharmacies</span>
+          <span class="btn-arrow">→</span>
+        }
       </button>
     </div>
 
+    <!-- Quick Search Suggestions -->
+    <div class="suggestions-row">
+      <span class="suggestions-label">Popular Searches:</span>
+      <div class="suggestion-chips">
+        @for (med of popularMedicines; track med) {
+          <button type="button" class="suggestion-chip" (click)="searchFor(med)">
+            + {{ med }}
+          </button>
+        }
+      </div>
+    </div>
   </section>
 
-  <!-- Prescription Upload -->
-  <section class="prescription-section">
-
-    <div class="prescription-info">
-      <div class="prescription-icon">+</div>
+  <!-- Prescription Upload Section -->
+  <section class="prescription-card">
+    <div class="prescription-header">
+      <div class="rx-badge">Rx</div>
       <div>
-        <h2>Search Using Prescription</h2>
-        <p>Upload a prescription to identify medicines automatically.</p>
+        <h3>Smart Prescription Scanner</h3>
+        <p>Upload a doctor's prescription image to automatically identify medications with simulated OCR.</p>
       </div>
     </div>
 
-    <label class="upload">
-      <span>Upload Prescription</span>
-      <span class="upload-hint">Choose an image from your device</span>
-      <input
-        type="file"
-        accept="image/*"
-        (change)="onFileChosen($event)"
-      />
-    </label>
+    <div class="upload-zone">
+      <label class="dropzone-label">
+        <div class="dropzone-inner">
+          <div class="upload-icon-circle">📄</div>
+          <div class="upload-text">
+            <strong>Click to upload or drag prescription photo</strong>
+            <span>Supports PNG, JPG, or JPEG up to 10MB</span>
+          </div>
+        </div>
+        <input
+          type="file"
+          accept="image/*"
+          (change)="onFileChosen($event)"
+        />
+      </label>
 
-    @if (previewUrl()) {
-      <div class="preview-container">
-        <img [src]="previewUrl()" alt="Prescription preview" />
-      </div>
-    }
+      <!-- Prescription Preview & Detection Feedback -->
+      @if (previewUrl()) {
+        <div class="preview-panel">
+          <div class="preview-image-wrapper">
+            <img [src]="previewUrl()" alt="Prescription preview" />
+            @if (uploading()) {
+              <div class="scan-overlay">
+                <div class="scan-laser"></div>
+                <span class="scan-text">Analyzing prescription...</span>
+              </div>
+            }
+          </div>
 
-    @if (uploading()) {
-      <p class="loading-message">Reading prescription...</p>
-    }
+          <div class="preview-actions">
+            <button type="button" class="clear-rx-btn" (click)="clearPrescription()">
+              ✕ Remove Image
+            </button>
+          </div>
+        </div>
+      }
+    </div>
 
+    <!-- Detected Medicines Pills -->
     @if (detected().length > 0) {
-      <div class="detected-section">
-        <h3>Detected Medicines</h3>
-        <p>Select a medicine to search for available pharmacies.</p>
-
-        <div class="chips">
+      <div class="detected-card">
+        <div class="detected-title">
+          <span class="check-icon">✓</span>
+          <span>Prescription Medicines Identified:</span>
+        </div>
+        <div class="detected-chips">
           @for (name of detected(); track name) {
-            <button type="button" (click)="searchFor(name)">
-              {{ name }}
+            <button type="button" class="detected-chip" (click)="searchFor(name)">
+              <span class="pill-dot"></span>
+              <strong>{{ name }}</strong>
+              <span class="chip-action">Search Stock →</span>
             </button>
           }
         </div>
       </div>
     }
-
   </section>
 
-  <!-- Search Results -->
-  <section class="results-section">
+  <!-- Results Section -->
+  <section class="results-container">
 
-    <div class="results-header">
-      <div>
-        <h2>Available Pharmacies</h2>
-        <p>Find pharmacies that have your requested medicine in stock.</p>
-      </div>
-    </div>
+    <!-- Filters & Sorting Bar -->
+    <div class="filters-bar">
 
-    <!-- Filters -->
-    <div class="filters">
-
-      <label>
-        Maximum Price (ETB)
-        <input
-          #max
-          type="number"
-          min="0"
-          placeholder="Any price"
-          (input)="setMaxPrice(max.value)"
-        />
-      </label>
-
-      <label>
-        Sort Results
-        <select #sort (change)="setSort(sort.value)">
-          <option value="none">Default</option>
-          <option value="priceAsc">Price: Low to High</option>
-          <option value="priceDesc">Price: High to Low</option>
-          @if (userLocation()) {
-            <option value="nearest">Nearest First</option>
-          }
-        </select>
-      </label>
-
-      <div class="location">
+      <div class="filter-group location-filter">
         <button
           type="button"
+          class="location-toggle-btn"
           (click)="useMyLocation()"
-          [disabled]="locating()">
-          {{ locating() ? 'Locating...' : userLocation() ? 'Location Set ✓' : '◎ Use My Location' }}
+          [class.active]="userLocation() !== null"
+          [disabled]="locating()"
+        >
+          <span class="gps-glyph">📍</span>
+          <span>{{ locating() ? 'Acquiring GPS...' : userLocation() ? 'GPS Location Active ✓' : 'Use My GPS Location' }}</span>
         </button>
       </div>
 
+      <!-- Distance Radius (Visible when GPS Active) -->
       @if (userLocation()) {
-        <label>
-          Maximum Distance (KM)
+        <div class="filter-group">
+          <label>Max Distance</label>
+          <div class="filter-input-wrap">
+            <input
+              #dist
+              type="number"
+              min="1"
+              placeholder="Any km"
+              (input)="setMaxDistance(dist.value)"
+            />
+            <span class="unit">km</span>
+          </div>
+        </div>
+      }
+
+      <!-- Max Price Filter -->
+      <div class="filter-group">
+        <label>Max Price</label>
+        <div class="filter-input-wrap">
           <input
-            #dist
+            #max
             type="number"
             min="0"
-            placeholder="Any distance"
-            (input)="setMaxDistance(dist.value)"
+            placeholder="Any price"
+            (input)="setMaxPrice(max.value)"
           />
-        </label>
-      }
+          <span class="unit">ETB</span>
+        </div>
+      </div>
+
+      <!-- Sorting Select -->
+      <div class="filter-group sort-group">
+        <label>Sort Results</label>
+        <select #sort (change)="setSort(sort.value)">
+          <option value="none">Default Relevance</option>
+          <option value="priceAsc">Price: Low to High</option>
+          <option value="priceDesc">Price: High to Low</option>
+          @if (userLocation()) {
+            <option value="nearest">Nearest Distance First</option>
+          }
+        </select>
+      </div>
 
     </div>
 
+    <!-- Location Error Notice -->
     @if (locationError()) {
-      <p class="empty">{{ locationError() }}</p>
-    }
-
-    @if (results().length > 0 && filtered().length === 0) {
-      <div class="empty-state">
-        <h3>No matching pharmacies</h3>
-        <p>Try adjusting your price or distance filters.</p>
+      <div class="alert-notice warning">
+        <span>⚠️</span>
+        <span>{{ locationError() }}</span>
       </div>
     }
 
+    <!-- Search State Counters -->
+    @if (searched()) {
+      <div class="results-meta">
+        <h3>Found <strong>{{ filtered().length }}</strong> verified pharmacy options</h3>
+        @if (results().length > filtered().length) {
+          <span class="filter-note">({{ results().length - filtered().length }} filtered out by price or distance)</span>
+        }
+      </div>
+    }
+
+    <!-- Empty State: No results from search -->
     @if (searched() && results().length === 0) {
-      <div class="empty-state">
-        <h3>No pharmacies found</h3>
-        <p>We couldn't find this medicine in any pharmacy. Try another medicine name.</p>
+      <div class="empty-results-card">
+        <div class="empty-icon">🏥</div>
+        <h3>No pharmacies currently have "{{ term.value }}" in stock</h3>
+        <p>Try searching for an alternative generic medication name or check back soon as inventories are updated in real time.</p>
+        <div class="empty-suggestions">
+          @for (med of popularMedicines; track med) {
+            <button type="button" (click)="searchFor(med)">Try {{ med }}</button>
+          }
+        </div>
       </div>
     }
 
-    <!-- Pharmacy Cards -->
+    <!-- Empty State: Filter eliminated all -->
+    @if (results().length > 0 && filtered().length === 0) {
+      <div class="empty-results-card">
+        <div class="empty-icon">🔍</div>
+        <h3>No pharmacies match your active filters</h3>
+        <p>Try expanding your maximum distance or price filters to see available options.</p>
+      </div>
+    }
+
+    <!-- Results Cards Grid -->
     <div class="results-grid">
-
       @for (r of filtered(); track r.pharmacyId + r.medicineName) {
+        <div class="pharmacy-card">
 
-        <div class="result-card">
-
-          <div class="result-top">
+          <!-- Card Top Header -->
+          <div class="card-header">
             <div>
-              <span class="availability">Available</span>
-              <h3>{{ r.medicineName }}</h3>
+              <div class="card-badge-row">
+                <span class="stock-badge" [class.low-stock]="r.quantity < 10">
+                  <span class="dot"></span>
+                  {{ r.quantity < 10 ? 'Low Stock (' + r.quantity + ' left)' : 'In Stock (' + r.quantity + ' available)' }}
+                </span>
+                @if (r.distanceKm !== null) {
+                  <span class="distance-badge">
+                    📍 {{ r.distanceKm.toFixed(1) }} km away
+                  </span>
+                }
+              </div>
+              <h2 class="med-name">{{ r.medicineName }}</h2>
             </div>
 
-            <div class="price">
-              <strong>{{ r.price }}</strong>
-              <span>ETB</span>
+            <div class="price-box">
+              <span class="price-val">{{ r.price }}</span>
+              <span class="currency">ETB</span>
             </div>
           </div>
 
-          <div class="result-divider"></div>
+          <div class="card-divider"></div>
 
-          <div class="pharmacy-details">
-            <div>
-              <span class="detail-label">Pharmacy</span>
-              <strong>{{ r.pharmacyName }}</strong>
+          <!-- Pharmacy Store Details -->
+          <div class="pharmacy-body">
+            <div class="store-row">
+              <div class="store-icon">🏥</div>
+              <div class="store-info">
+                <strong>{{ r.pharmacyName }}</strong>
+                <span class="verified-tag">✓ Licensed Pharmacy</span>
+              </div>
             </div>
 
-            <div>
-              <span class="detail-label">Address</span>
-              <strong>{{ r.address }}</strong>
+            <div class="info-line">
+              <span class="info-label">Address:</span>
+              <span class="info-val">{{ r.address }}</span>
             </div>
 
-            <div>
-              <span class="detail-label">Contact</span>
-              <strong>{{ r.phone }}</strong>
+            <div class="info-line">
+              <span class="info-label">Phone:</span>
+              <span class="info-val">{{ r.phone }}</span>
             </div>
           </div>
 
-          <div class="result-footer">
-            <span class="stock">
-              {{ r.quantity }} in stock
-            </span>
+          <!-- Card Footer Actions -->
+          <div class="card-footer">
+            <a [href]="'tel:' + r.phone" class="card-action-btn phone">
+              <span>📞</span> Call Store
+            </a>
 
-            @if (r.distanceKm !== null) {
-              <span class="distance">
-                {{ r.distanceKm.toFixed(1) }} km away
-              </span>
-            }
+            <a
+              [href]="getDirectionsUrl(r.latitude, r.longitude)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="card-action-btn map"
+            >
+              <span>🧭</span> Get Directions
+            </a>
           </div>
 
         </div>
-
       }
-
     </div>
 
   </section>

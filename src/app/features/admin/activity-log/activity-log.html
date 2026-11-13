@@ -1,20 +1,24 @@
-<p>activity-log works!</p>
-<section>
-  <div class="header">
-    <h3>System activity</h3>
-    <button type="button" (click)="load()">Refresh</button>
-  </div>
-
-  @if (entries().length === 0) {
-    <p class="empty">No activity yet.</p>
-  } @else {
-    <ul>
-      @for (e of entries(); track e.id) {
-        <li>
-          <span class="time">{{ e.timestamp | date: 'short' }}</span>
-          <span>{{ e.message }}</span>
-        </li>
-      }
-    </ul>
+<button type="button" class="bell" (click)="toggle()" aria-label="Activity notifications">
+  🔔
+  @if (unread() > 0) {
+    <span class="badge">{{ unread() }}</span>
   }
-</section>
+</button>
+
+@if (open()) {
+  <div class="panel">
+    <h4>System activity</h4>
+    @if (entries().length === 0) {
+      <p class="empty">No activity yet.</p>
+    } @else {
+      <ul>
+        @for (e of entries(); track e.id) {
+          <li>
+            <span class="time">{{ e.timestamp | date: 'short' }}</span>
+            <span>{{ e.message }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+}

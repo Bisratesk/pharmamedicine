@@ -1,12 +1,11 @@
-import { Component } from '@angular/core';
-import { signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
-  imports: [ReactiveFormsModule, RouterLink],
   selector: 'app-register',
+  imports: [ReactiveFormsModule, RouterLink],
   styleUrl: './register.css',
   templateUrl: './register.html',
 })
@@ -14,6 +13,7 @@ export class Register {
   form;
   error = signal('');
   loading = signal(false);
+  showPassword = signal(false);
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.form = this.fb.nonNullable.group({
@@ -22,6 +22,14 @@ export class Register {
       password: ['', [Validators.required, Validators.minLength(4)]],
       role: ['Customer' as 'Customer' | 'PharmacyOwner', Validators.required],
     });
+  }
+
+  selectRole(role: 'Customer' | 'PharmacyOwner') {
+    this.form.patchValue({ role });
+  }
+
+  togglePassword() {
+    this.showPassword.update(v => !v);
   }
 
   submit() {

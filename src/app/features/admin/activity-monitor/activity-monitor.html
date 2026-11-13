@@ -1,0 +1,108 @@
+<div class="activity-page">
+
+  <!-- Header -->
+  <header class="activity-header">
+    <div>
+      <span class="section-label">ADMINISTRATION / MONITORING</span>
+      <h1>Activity Monitoring</h1>
+      <p>Real-time audit log of actions performed across Pharmacy Finder.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="refresh-btn" (click)="load()" [disabled]="loading()">
+        {{ loading() ? 'Refreshing...' : '↻ Refresh Feed' }}
+      </button>
+      <a routerLink="/admin" class="back-btn">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </header>
+
+  <!-- Activity Content -->
+  <section class="activity-content">
+    <div class="content-heading">
+      <div>
+        <h2>System Activity Stream</h2>
+        <p>Complete chronological history of pharmacy registrations, approvals, and inventory changes.</p>
+      </div>
+
+      <div class="activity-stats">
+        <span class="stat-count">{{ filteredActivities().length }}</span>
+        <span class="stat-label">Total Events</span>
+      </div>
+    </div>
+
+    <!-- Toolbar / Search -->
+    <div class="activity-toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          #search
+          type="text"
+          placeholder="Filter activities by pharmacy, medicine, or action..."
+          (input)="searchQuery.set(search.value)"
+        />
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="state-container">
+        <div class="loader"></div>
+        <p>Loading activity logs...</p>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @else if (filteredActivities().length === 0) {
+      <div class="state-container empty">
+        <div class="empty-icon">📋</div>
+        <h3>No activities found</h3>
+        <p>
+          @if (searchQuery()) {
+            No activity records match your search criteria.
+          } @else {
+            No actions have been performed on the platform yet. Registrations, approvals, and inventory changes will appear here in real time.
+          }
+        </p>
+      </div>
+    }
+
+    <!-- Activity Table -->
+    @else {
+      <div class="table-container">
+        <table class="activity-table">
+          <thead>
+            <tr>
+              <th class="col-time">TIMESTAMP</th>
+              <th class="col-type">EVENT TYPE</th>
+              <th class="col-message">ACTIVITY DESCRIPTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (act of filteredActivities(); track act.id) {
+              <tr class="activity-row">
+                <td class="col-time">
+                  <div class="time-wrapper">
+                    <span class="date">{{ act.timestamp | date: 'mediumDate' }}</span>
+                    <span class="hour">{{ act.timestamp | date: 'shortTime' }}</span>
+                  </div>
+                </td>
+                <td class="col-type">
+                  <span class="badge" [class]="getBadgeClass(act.message)">
+                    {{ getBadgeLabel(act.message) }}
+                  </span>
+                </td>
+                <td class="col-message">
+                  <span class="message-text">{{ act.message }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  </section>
+
+</div>

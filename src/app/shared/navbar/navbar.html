@@ -1,55 +1,87 @@
+<header class="navbar-wrapper">
+  <nav class="navbar">
 
-<nav class="navbar">
+    <!-- Brand Logo -->
+    <a class="brand" [routerLink]="getHomeRoute()">
+      <div class="brand-icon-box">
+        <svg class="brand-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 6v12M6 12h12" />
+          <path d="M4 4h16v16H4z" rx="4" />
+        </svg>
+        <span class="brand-status-pulse"></span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Pharmacy<span class="brand-highlight">Finder</span></span>
+        <span class="brand-tagline">Health Network</span>
+      </div>
+    </a>
 
-  <!-- Brand -->
-  <a class="brand" routerLink="/">
-    <span class="brand-icon">P</span>
-    <span>Pharmacy Finder</span>
-  </a>
+    @if (auth.currentUser(); as user) {
 
-  @if (auth.currentUser()) {
+      <!-- Center Nav Links -->
+      <div class="nav-links">
+        @if (user.role === 'Admin') {
+          <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <span class="nav-icon">📊</span>
+            Dashboard
+          </a>
+          <a routerLink="/admin/activity" routerLinkActive="active">
+            <span class="nav-icon">⚡</span>
+            Activity Stream
+          </a>
+        }
 
-    <!-- Navigation Links -->
-    <div class="nav-links">
+        @if (user.role === 'PharmacyOwner') {
+          <a routerLink="/owner" routerLinkActive="active">
+            <span class="nav-icon">🏥</span>
+            My Pharmacy
+          </a>
+        }
 
-      @if (auth.currentUser()?.role === 'Admin') {
-        <a routerLink="/admin" routerLinkActive="active">
-          Dashboard
-        </a>
-      }
-
-      @if (auth.currentUser()?.role === 'PharmacyOwner') {
-        <a routerLink="/owner" routerLinkActive="active">
-          My Pharmacy
-        </a>
-      }
-
-      <a routerLink="/search" routerLinkActive="active">
-        Find Medicine
-      </a>
-
-    </div>
-
-    <!-- User Profile and Logout -->
-    <div class="nav-actions">
-
-      <div class="user-profile">
-        <div class="user-avatar">
-          {{ auth.currentUser()?.fullName?.charAt(0) }}
-        </div>
-
-        <div class="user-info">
-          <strong>{{ auth.currentUser()?.fullName }}</strong>
-          <span>{{ auth.currentUser()?.role }}</span>
-        </div>
+        @if (user.role === 'Customer') {
+          <a routerLink="/search" routerLinkActive="active">
+            <span class="nav-icon">🔍</span>
+            Find Medicines
+          </a>
+        }
       </div>
 
-      <button class="logout-button" (click)="logout()">
-        Logout
-      </button>
+      <!-- Right User Actions -->
+      <div class="nav-actions">
+        
+        <!-- User Badge -->
+        <div class="user-chip">
+          <div class="user-avatar" [class]="'role-' + user.role.toLowerCase()">
+            {{ user.fullName.charAt(0) }}
+          </div>
 
-    </div>
+          <div class="user-meta">
+            <span class="user-name">{{ user.fullName }}</span>
+            <span class="role-pill" [class]="'role-' + user.role.toLowerCase()">
+              {{ user.role === 'PharmacyOwner' ? 'Pharmacy Owner' : user.role }}
+            </span>
+          </div>
+        </div>
 
-  }
+        <!-- Logout Button -->
+        <button type="button" class="logout-btn" (click)="logout()" title="Sign out">
+          <svg class="logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span class="logout-text">Logout</span>
+        </button>
 
-</nav>
+      </div>
+
+    } @else {
+      <!-- Unauthenticated Nav -->
+      <div class="guest-actions">
+        <a routerLink="/login" class="nav-btn ghost">Sign In</a>
+        <a routerLink="/register" class="nav-btn primary">Create Account</a>
+      </div>
+    }
+
+  </nav>
+</header>

@@ -1,42 +1,133 @@
-<section>
-  <div class="header">
-    <h3>Medicines in pharmacies</h3>
-    <button type="button" (click)="load()">Refresh</button>
+<div class="med-manager-wrapper">
+
+  <!-- Toolbar -->
+  <div class="manager-toolbar">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        #search
+        type="text"
+        placeholder="Search platform medicines or pharmacy name..."
+        (input)="searchQuery.set(search.value)"
+      />
+    </div>
+
+    <div class="toolbar-actions">
+      <span class="count-badge">
+        <strong>{{ filteredItems().length }}</strong> listings
+      </span>
+      <button type="button" class="refresh-btn" (click)="load()" title="Refresh platform listings">
+        ↻ Refresh
+      </button>
+    </div>
   </div>
 
+  <!-- Editing Panel (Visible when an item is selected for editing) -->
   @if (editingId() !== null) {
-    <form [formGroup]="form" (ngSubmit)="save()">
-      <input placeholder="Medicine name" formControlName="medicineName" />
-      <label>Price <input type="number" step="0.01" formControlName="price" /></label>
-      <label>Quantity <input type="number" formControlName="quantity" /></label>
-      <div class="actions">
-        <button type="submit" [disabled]="form.invalid">Save changes</button>
-        <button type="button" class="secondary" (click)="cancel()">Cancel</button>
+    <div class="edit-card">
+      <div class="edit-header">
+        <span class="badge-edit">✏️ ADMIN MODERATION</span>
+        <h4>Update Medicine Listing</h4>
       </div>
-    </form>
+
+      <form [formGroup]="form" (ngSubmit)="save()" class="edit-form-grid">
+        <div class="field-item">
+          <label for="adminMedName">Medicine Name</label>
+          <input id="adminMedName" formControlName="medicineName" />
+        </div>
+
+        <div class="field-item">
+          <label for="adminPrice">Unit Price (ETB)</label>
+          <input id="adminPrice" type="number" step="0.01" formControlName="price" />
+        </div>
+
+        <div class="field-item">
+          <label for="adminQty">Quantity in Stock</label>
+          <input id="adminQty" type="number" min="0" formControlName="quantity" />
+        </div>
+
+        <div class="edit-actions">
+          <button type="submit" class="btn-save" [disabled]="form.invalid">Save Changes</button>
+          <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+        </div>
+      </form>
+    </div>
   }
 
+  <!-- Listings Table -->
   @if (items().length === 0) {
-    <p>No pharmacy has added medicines yet.</p>
+    <div class="empty-state">
+      <div class="empty-icon">💊</div>
+      <h4>No medicines listed yet</h4>
+      <p>Medicines added by approved pharmacies will be listed here for administrative management.</p>
+    </div>
+  } @else if (filteredItems().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h4>No listings match your search</h4>
+      <p>Try searching for a different medicine name or pharmacy name.</p>
+    </div>
   } @else {
-    <table>
-      <thead>
-        <tr><th>Medicine</th><th>Pharmacy</th><th>Price</th><th>Qty</th><th></th></tr>
-      </thead>
-      <tbody>
-        @for (m of items(); track m.id) {
+    <div class="table-card">
+      <table class="med-table">
+        <thead>
           <tr>
-            <td>{{ m.medicineName }}</td>
-            <td>{{ m.pharmacyName }}</td>
-            <td>{{ m.price }}</td>
-            <td>{{ m.quantity }}</td>
-            <td>
-              <button type="button" (click)="edit(m)">Edit</button>
-              <button type="button" class="danger" (click)="remove(m.id)">Delete</button>
-            </td>
+            <th>MEDICINE</th>
+            <th>PHARMACY</th>
+            <th>PRICE (ETB)</th>
+            <th>STOCK LEVEL</th>
+            <th class="col-actions">ACTIONS</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (m of filteredItems(); track m.id) {
+            <tr [class.highlight-row]="editingId() === m.id">
+              <td>
+                <div class="med-title-cell">
+                  <span class="med-icon">💊</span>
+                  <strong>{{ m.medicineName }}</strong>
+                </div>
+              </td>
+
+              <td>
+                <div class="pharmacy-cell">
+                  <span class="store-icon">🏥</span>
+                  <span>{{ m.pharmacyName }}</span>
+                </div>
+              </td>
+
+              <td>
+                <div class="price-pill">
+                  <strong>{{ m.price | number: '1.2-2' }}</strong>
+                  <span class="curr">ETB</span>
+                </div>
+              </td>
+
+              <td>
+                @if (m.quantity === 0) {
+                  <span class="badge out">Out of Stock</span>
+                } @else if (m.quantity < 10) {
+                  <span class="badge low">{{ m.quantity }} units (Low)</span>
+                } @else {
+                  <span class="badge ok">{{ m.quantity }} in stock</span>
+                }
+              </td>
+
+              <td class="col-actions">
+                <div class="action-buttons">
+                  <button type="button" class="btn-edit" (click)="edit(m)">
+                    Edit
+                  </button>
+                  <button type="button" class="btn-delete" (click)="remove(m.id)">
+                    Remove
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
-</section>
+
+</div>

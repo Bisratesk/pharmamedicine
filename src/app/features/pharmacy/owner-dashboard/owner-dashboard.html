@@ -1,203 +1,275 @@
-
-<div class="owner-dashboard">
+<div class="owner-page-container">
 
   <!-- Page Header -->
-  <div class="page-header">
-    <div>
-      <h1>Pharmacy Management</h1>
-      <p>Manage your pharmacy profile and medicine inventory.</p>
+  <header class="page-header">
+    <div class="header-main">
+      <span class="eyebrow">PHARMACY OWNER DASHBOARD</span>
+      <h1>Pharmacy Management Center</h1>
+      <p>Configure your pharmacy profile, track verification status, and manage real-time medicine inventory.</p>
     </div>
-    <span class="page-label">Pharmacy Owner</span>
-  </div>
+
+    <div class="header-badge">
+      <span class="pulse-indicator"></span>
+      <span>Owner Portal</span>
+    </div>
+  </header>
 
   @if (loadingPharmacy()) {
-    <div class="dashboard-section loading-state">
-      <p>Loading pharmacy information...</p>
+    <div class="dashboard-card loading-state">
+      <div class="spinner"></div>
+      <p>Loading pharmacy profile...</p>
     </div>
   } @else if (pharmacy(); as p) {
 
-    <!-- Pharmacy Overview -->
-    <section class="dashboard-section">
+    <!-- Pharmacy Overview Card -->
+    <section class="dashboard-card overview-card">
 
-      <div class="section-header">
-        <div>
-          <h2>My Pharmacy</h2>
-          <p>View your registered pharmacy information.</p>
-        </div>
-
-        <span class="status" [class]="p.status">
-          {{ p.status }}
-        </span>
-      </div>
-
-      <div class="pharmacy-overview">
-        <div class="pharmacy-title">
-          <div class="pharmacy-icon">P</div>
+      <div class="card-header-row">
+        <div class="store-identity">
+          <div class="store-avatar">🏥</div>
           <div>
-            <h3>{{ p.name }}</h3>
-            <span>Registered Pharmacy</span>
+            <div class="title-with-badge">
+              <h2>{{ p.name }}</h2>
+              <span class="status-badge" [class]="p.status.toLowerCase()">
+                <span class="status-dot"></span>
+                {{ p.status === 'Approved' ? 'Verified & Active' : p.status === 'Pending' ? 'Verification Pending' : 'Registration Rejected' }}
+              </span>
+            </div>
+            <p class="store-sub">License: <strong>{{ p.licenseNumber }}</strong> • Registered Business Profile</p>
           </div>
         </div>
 
-        <div class="details-grid">
-
-          <div class="detail-item">
-            <span class="detail-label">Address</span>
-            <strong>{{ p.address }}</strong>
-          </div>
-
-          <div class="detail-item">
-            <span class="detail-label">Phone Number</span>
-            <strong>{{ p.phone }}</strong>
-          </div>
-
-          <div class="detail-item">
-            <span class="detail-label">License Number</span>
-            <strong>{{ p.licenseNumber }}</strong>
-          </div>
-
-          <div class="detail-item">
-            <span class="detail-label">Operating Hours</span>
-            <strong>{{ p.openingTime }} - {{ p.closingTime }}</strong>
-          </div>
-
+        <div class="hours-tag">
+          <span class="clock-icon">🕒</span>
+          <span>Operating: {{ p.openingTime }} – {{ p.closingTime }}</span>
         </div>
       </div>
 
+      <!-- Quick Details Grid -->
+      <div class="store-details-grid">
+        <div class="detail-box">
+          <span class="detail-label">Physical Address</span>
+          <strong class="detail-value">{{ p.address }}</strong>
+        </div>
+
+        <div class="detail-box">
+          <span class="detail-label">Contact Phone</span>
+          <strong class="detail-value">{{ p.phone }}</strong>
+        </div>
+
+        <div class="detail-box">
+          <span class="detail-label">GPS Coordinates</span>
+          <strong class="detail-value">{{ p.latitude.toFixed(4) }}, {{ p.longitude.toFixed(4) }}</strong>
+        </div>
+
+        <div class="detail-box">
+          <span class="detail-label">Operating Schedule</span>
+          <strong class="detail-value">{{ p.openingTime }} - {{ p.closingTime }} Daily</strong>
+        </div>
+      </div>
+
+      <!-- Status Notification Banners -->
       @if (p.status === 'Approved') {
-        <div class="notice approved-notice">
-          <strong>Pharmacy approved</strong>
-          <p>Your pharmacy is approved. You can now manage your medicine inventory.</p>
+        <div class="status-banner approved">
+          <span class="banner-icon">✓</span>
+          <div>
+            <strong>Pharmacy Approved & Publicly Visible</strong>
+            <p>Your pharmacy is fully verified. Customers can discover your store and search your medicine inventory in real time below.</p>
+          </div>
         </div>
       } @else if (p.status === 'Pending') {
-        <div class="notice pending-notice">
-          <strong>Approval pending</strong>
-          <p>Your pharmacy is waiting for administrator approval. You can manage your inventory once it is approved.</p>
+        <div class="status-banner pending">
+          <span class="banner-icon">⏳</span>
+          <div class="banner-text">
+            <strong>Administrator Review in Progress</strong>
+            <p>Your registration is currently under review by platform administrators. Medicine inventory management will be unlocked immediately upon approval.</p>
+            
+            <div class="review-timeline">
+              <div class="timeline-step completed">
+                <span class="step-num">1</span>
+                <span>Submitted</span>
+              </div>
+              <div class="timeline-bar active"></div>
+              <div class="timeline-step in-progress">
+                <span class="step-num">2</span>
+                <span>Admin Review</span>
+              </div>
+              <div class="timeline-bar"></div>
+              <div class="timeline-step upcoming">
+                <span class="step-num">3</span>
+                <span>Inventory Unlocked</span>
+              </div>
+            </div>
+          </div>
         </div>
       } @else {
-        <div class="notice rejected-notice">
-          <strong>Registration rejected</strong>
-          <p>Your pharmacy registration was rejected. Please contact the administrator for further information.</p>
+        <div class="status-banner rejected">
+          <span class="banner-icon">✕</span>
+          <div>
+            <strong>Registration Could Not Be Approved</strong>
+            <p>Your pharmacy application was rejected by the administration. For questions or to update your business documentation, please contact <a href="mailto:support@pharmacyfinder.com">support&#64;pharmacyfinder.com</a>.</p>
+          </div>
         </div>
       }
 
     </section>
 
-    <!-- Stock Management -->
+    <!-- Stock Management Section (Unlocked when Approved) -->
     @if (p.status === 'Approved') {
-      <section class="dashboard-section">
-
-        <div class="section-header">
+      <section class="dashboard-card inventory-section">
+        <div class="section-title-bar">
           <div>
-            <h2>Medicine Inventory</h2>
-            <p>Add, update, and manage medicines in your pharmacy.</p>
+            <span class="section-tag">CATALOG & INVENTORY</span>
+            <h2>Medicine Stock Management</h2>
+            <p>Keep your prices and stock levels up to date so customers get accurate search results.</p>
           </div>
-          <span class="inventory-label">Inventory Management</span>
         </div>
 
         <app-stockmanagment [pharmacyId]="p.id" />
-
       </section>
     }
 
   } @else {
 
-    <!-- Pharmacy Registration -->
-    <section class="dashboard-section registration-section">
+    <!-- Pharmacy Registration Flow -->
+    <section class="dashboard-card registration-card">
 
-      <div class="section-header">
+      <div class="reg-header">
+        <div class="reg-icon-circle">🏥</div>
         <div>
           <h2>Register Your Pharmacy</h2>
-          <p>Submit your pharmacy details for administrator approval.</p>
+          <p>Complete the profile below to list your business on the Pharmacy Finder network and start receiving customer inquiries.</p>
         </div>
-        <span class="registration-label">New Registration</span>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="submit()">
+      <form [formGroup]="form" (ngSubmit)="submit()" class="registration-form">
 
-        <div class="form-section">
-          <h3>Basic Information</h3>
-          <p>Enter your pharmacy's official details.</p>
+        <!-- 1. Store Details -->
+        <div class="form-block">
+          <div class="block-title">
+            <span class="step-badge">1</span>
+            <div>
+              <h3>Business Information</h3>
+              <p>Official trade name and legal licensing credentials</p>
+            </div>
+          </div>
 
-          <div class="form-grid">
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="name">Pharmacy Business Name</label>
+              <input id="name" placeholder="e.g. HealthFirst Pharmacy" formControlName="name" />
+              @if (form.controls.name.dirty && form.controls.name.invalid) {
+                <small class="field-error">Name must be at least 3 characters</small>
+              }
+            </div>
 
-            <label>
-              Pharmacy Name
-              <input placeholder="Enter pharmacy name" formControlName="name" />
-            </label>
+            <div class="form-field">
+              <label for="licenseNumber">Pharmacy License Number</label>
+              <input id="licenseNumber" placeholder="e.g. PH-2026-9812" formControlName="licenseNumber" />
+              @if (form.controls.licenseNumber.dirty && form.controls.licenseNumber.invalid) {
+                <small class="field-error">License number is required</small>
+              }
+            </div>
 
-            <label>
-              License Number
-              <input placeholder="Enter license number" formControlName="licenseNumber" />
-            </label>
+            <div class="form-field">
+              <label for="phone">Store Phone Number</label>
+              <input id="phone" placeholder="+251 91 123 4567" formControlName="phone" />
+              @if (form.controls.phone.dirty && form.controls.phone.invalid) {
+                <small class="field-error">Please enter a valid phone number (min 7 digits)</small>
+              }
+            </div>
 
-            <label>
-              Phone Number
-              <input placeholder="Enter phone number" formControlName="phone" />
-            </label>
-
-            <label>
-              Address
-              <input placeholder="Enter pharmacy address" formControlName="address" />
-            </label>
-
+            <div class="form-field">
+              <label for="address">Street Address & Landmark</label>
+              <input id="address" placeholder="e.g. Bole Road, Near Medhanialem Mall" formControlName="address" />
+              @if (form.controls.address.dirty && form.controls.address.invalid) {
+                <small class="field-error">Street address is required</small>
+              }
+            </div>
           </div>
         </div>
 
-        <div class="form-section">
-          <h3>Location</h3>
-          <p>Capture your pharmacy's geographical location.</p>
+        <!-- 2. Location GPS -->
+        <div class="form-block">
+          <div class="block-title">
+            <span class="step-badge">2</span>
+            <div>
+              <h3>Geographic Location (GPS)</h3>
+              <p>Used to calculate exact distance for nearby customer searches</p>
+            </div>
+          </div>
 
-          <button
-            type="button"
-            class="location-button"
-            (click)="useMyLocation()"
-            [disabled]="locating()">
+          <div class="location-capture-box">
+            <button
+              type="button"
+              class="gps-capture-btn"
+              (click)="useMyLocation()"
+              [class.captured]="locationSet()"
+              [disabled]="locating()"
+            >
+              <span class="btn-icon">📍</span>
+              <span>{{ locating() ? 'Acquiring GPS Signal...' : locationSet() ? 'Location Set ✓ (Recapture)' : 'Auto-Capture My Store GPS Location' }}</span>
+            </button>
 
-            {{ locating() ? 'Locating...' : '◎ Use my current location' }}
-
-          </button>
-
-          @if (locationSet()) {
-            <small class="location-success">Location captured successfully ✓</small>
-          }
-        </div>
-
-        <div class="form-section">
-          <h3>Operating Hours</h3>
-          <p>Specify when your pharmacy is open.</p>
-
-          <div class="form-grid">
-
-            <label>
-              Opening Time
-              <input type="time" formControlName="openingTime" />
-            </label>
-
-            <label>
-              Closing Time
-              <input type="time" formControlName="closingTime" />
-            </label>
-
+            @if (locationSet()) {
+              <div class="coords-display">
+                <span class="coord-item">Lat: <strong>{{ form.controls.latitude.value }}</strong></span>
+                <span class="coord-item">Lng: <strong>{{ form.controls.longitude.value }}</strong></span>
+                <span class="verified-coord">✓ Accurate</span>
+              </div>
+            } @else {
+              <span class="gps-hint">Click the button while at your pharmacy to automatically pin your location.</span>
+            }
           </div>
         </div>
 
+        <!-- 3. Operating Hours -->
+        <div class="form-block">
+          <div class="block-title">
+            <span class="step-badge">3</span>
+            <div>
+              <h3>Daily Operating Hours</h3>
+              <p>When is your pharmacy open to the public?</p>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="openingTime">Opening Time</label>
+              <input id="openingTime" type="time" formControlName="openingTime" />
+            </div>
+
+            <div class="form-field">
+              <label for="closingTime">Closing Time</label>
+              <input id="closingTime" type="time" formControlName="closingTime" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Error Feedback -->
         @if (error()) {
-          <div class="error-message">
-            {{ error() }}
+          <div class="form-error-alert">
+            <span>⚠️</span>
+            <span>{{ error() }}</span>
           </div>
         }
 
-        <div class="form-footer">
-          <p>Make sure all information is accurate before submitting.</p>
+        <!-- Submission Row -->
+        <div class="form-submit-row">
+          <p class="submit-notice">By submitting, your pharmacy will enter the verification pipeline for administrator review.</p>
 
           <button
             type="submit"
-            class="submit-button"
-            [disabled]="form.invalid || saving()">
-
-            {{ saving() ? 'Submitting...' : 'Submit Registration' }}
-
+            class="reg-submit-btn"
+            [disabled]="form.invalid || !locationSet() || saving()"
+          >
+            @if (saving()) {
+              <span class="spinner-sm"></span>
+              <span>Submitting Application...</span>
+            } @else {
+              <span>Submit Registration for Approval</span>
+              <span class="btn-arrow">→</span>
+            }
           </button>
         </div>
 

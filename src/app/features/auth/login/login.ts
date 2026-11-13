@@ -13,6 +13,7 @@ export class Login {
   form;
   error = signal('');
   loading = signal(false);
+  showPassword = signal(false);
 
   constructor(
     private fb: FormBuilder,
@@ -23,6 +24,15 @@ export class Login {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(4)]],
     });
+  }
+
+  togglePassword() {
+    this.showPassword.update(v => !v);
+  }
+
+  fillDemo(email: string) {
+    this.form.patchValue({ email, password: '1234' });
+    this.submit();
   }
 
   submit() {
@@ -41,7 +51,6 @@ export class Login {
         this.loading.set(false);
         this.error.set(err.message);
       },
-
     });
   }
 }

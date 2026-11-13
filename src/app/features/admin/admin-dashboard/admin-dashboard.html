@@ -1,82 +1,196 @@
-
 <div class="admin-dashboard">
 
-  <!-- Page Header -->
-  <div class="page-header">
-    <div>
-      <h1>Admin Dashboard</h1>
-      <p>Manage pharmacies, medicines, and platform activities.</p>
+  <!-- Dashboard Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <span class="eyebrow">PHARMACY FINDER / ADMINISTRATION</span>
+      <h1>Executive Administration Portal</h1>
+      <p>Review pharmacy license registrations, oversee platform medicine listings, and monitor live audit activity.</p>
     </div>
-    <span class="admin-badge">Administrator</span>
+
+    <div class="admin-profile">
+      <div class="profile-icon">🛡️</div>
+      <div class="profile-info">
+        <strong>Platform Administrator</strong>
+        <span class="admin-badge-online"><span class="pulse-dot"></span> System Live</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Executive Metric KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap primary">🏥</div>
+      <div class="kpi-meta">
+        <span class="kpi-value">{{ totalCount() }}</span>
+        <span class="kpi-label">Registered Pharmacies</span>
+      </div>
+    </div>
+
+    <div class="kpi-card" [class.attention]="pendingCount() > 0">
+      <div class="kpi-icon-wrap warning">⏳</div>
+      <div class="kpi-meta">
+        <span class="kpi-value">{{ pendingCount() }}</span>
+        <span class="kpi-label">Pending Verifications</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap success">✓</div>
+      <div class="kpi-meta">
+        <span class="kpi-value">{{ approvedCount() }}</span>
+        <span class="kpi-label">Verified & Active</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap danger">✕</div>
+      <div class="kpi-meta">
+        <span class="kpi-value">{{ rejectedCount() }}</span>
+        <span class="kpi-label">Rejected Applications</span>
+      </div>
+    </div>
   </div>
 
-  <!-- Pending Pharmacies -->
-  <section class="dashboard-section">
+  <!-- Pharmacy Management Section -->
+  <section class="dashboard-section pharmacy-section">
 
-    <div class="section-header">
+    <div class="section-heading">
       <div>
-        <h2>Pending Pharmacies</h2>
-        <p>Review and manage pharmacy registration requests.</p>
+        <span class="section-label">REGISTRATION & APPROVALS</span>
+        <h2>Pharmacy License Management</h2>
+        <p>Review and verify legal trade licenses and store coordinates submitted by pharmacy owners.</p>
       </div>
 
-      <span class="count-badge">{{ pending().length }} Pending</span>
+      <div class="total-count">
+        <span class="count-number">{{ shown().length }}</span>
+        <span class="count-label">Pharmacies displayed</span>
+      </div>
     </div>
 
-    @if (loading()) {
-      <div class="empty-state">Loading pharmacies...</div>
-    } @else if (pending().length === 0) {
-      <div class="empty-state">
-        <h3>No pending pharmacies</h3>
-        <p>All pharmacy registration requests have been reviewed.</p>
+    <!-- Search and Filters -->
+    <div class="toolbar">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input
+          #q
+          type="text"
+          class="search"
+          placeholder="Search by pharmacy name, license number, address, or phone..."
+          (input)="query.set(q.value)"
+        />
       </div>
-    } @else {
 
+      <div class="tabs">
+        @for (f of filters; track f) {
+          <button
+            type="button"
+            [class.active]="filter() === f"
+            (click)="filter.set(f)">
+            <span>{{ f }}</span>
+            <span class="tab-count-badge">{{ getFilterCount(f) }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="empty-state">
+        <div class="loader"></div>
+        <p>Loading pharmacy records...</p>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @else if (shown().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>No pharmacies found</h3>
+        <p>Try modifying your search criteria or switching filter tabs.</p>
+      </div>
+    }
+
+    <!-- Pharmacy Table -->
+    @else {
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>Pharmacy</th>
-              <th>Contact</th>
-              <th>License</th>
-              <th>Operating Hours</th>
-              <th>Location</th>
-              <th>Actions</th>
+              <th>PHARMACY</th>
+              <th>CONTACT DETAILS</th>
+              <th>LICENSE NUMBER</th>
+              <th>OPERATING HOURS</th>
+              <th>VERIFICATION STATUS</th>
+              <th class="action-column">ADMIN ACTIONS</th>
             </tr>
           </thead>
 
           <tbody>
-            @for (p of pending(); track p.id) {
+            @for (p of shown(); track p.id) {
               <tr>
                 <td>
-                  <div class="pharmacy-name">{{ p.name }}</div>
-                  <div class="sub-text">{{ p.address }}</div>
-                </td>
-
-                <td>{{ p.phone }}</td>
-
-                <td>{{ p.licenseNumber }}</td>
-
-                <td>{{ p.openingTime }} - {{ p.closingTime }}</td>
-
-                <td>
-                  <div class="coordinates">
-                    {{ p.latitude }}, {{ p.longitude }}
+                  <div class="pharmacy-cell">
+                    <div class="pharmacy-avatar">
+                      {{ p.name.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="pharmacy-details">
+                      <strong>{{ p.name }}</strong>
+                      <span>{{ p.address }}</span>
+                    </div>
                   </div>
                 </td>
 
                 <td>
-                  <div class="actions">
-                    <button
-                      class="approve"
-                      (click)="decide(p.id, 'Approved')">
-                      Approve
-                    </button>
+                  <div class="contact-details">
+                    <span>📞 {{ p.phone }}</span>
+                  </div>
+                </td>
 
-                    <button
-                      class="reject"
-                      (click)="decide(p.id, 'Rejected')">
-                      Reject
-                    </button>
+                <td>
+                  <span class="license-number">{{ p.licenseNumber }}</span>
+                </td>
+
+                <td>
+                  <span class="operating-hours">
+                    🕒 {{ p.openingTime }} – {{ p.closingTime }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="status" [class]="'status ' + p.status">
+                    <span class="status-dot"></span>
+                    {{ p.status }}
+                  </span>
+                </td>
+
+                <td>
+                  <div class="actions">
+
+                    @if (p.status !== 'Approved') {
+                      <button
+                        class="action-btn approve"
+                        (click)="decide(p.id, 'Approved')">
+                        ✓ Approve
+                      </button>
+                    }
+
+                    @if (p.status !== 'Rejected') {
+                      <button
+                        class="action-btn reject"
+                        (click)="decide(p.id, 'Rejected')">
+                        ✕ Reject
+                      </button>
+                    }
+
+                    @if (p.status !== 'Pending') {
+                      <button
+                        class="action-btn secondary"
+                        (click)="decide(p.id, 'Pending')">
+                        Reset
+                      </button>
+                    }
+
                   </div>
                 </td>
               </tr>
@@ -85,14 +199,16 @@
         </table>
       </div>
     }
+
   </section>
 
-  <!-- Medicine Management -->
+  <!-- Platform Medicine Catalog Management -->
   <section class="dashboard-section">
-    <div class="section-header">
+    <div class="section-heading">
       <div>
-        <h2>Medicine Management</h2>
-        <p>Manage the medicines available on the platform.</p>
+        <span class="section-label">INVENTORY OVERSIGHT</span>
+        <h2>Platform Medicine Directory</h2>
+        <p>Audit and moderate medicines listed across all approved pharmacies.</p>
       </div>
     </div>
 
@@ -101,17 +217,22 @@
     </div>
   </section>
 
-  <!-- Activity Log -->
-  <section class="dashboard-section">
-    <div class="section-header">
+  <!-- Activity Monitoring Section -->
+  <section class="dashboard-section activity-preview">
+    <div class="section-heading">
       <div>
-        <h2>Recent Activity</h2>
-        <p>Monitor recent actions and platform updates.</p>
+        <span class="section-label">AUDIT TRAIL</span>
+        <h2>Recent Platform Activity</h2>
+        <p>Monitor system actions, inventory updates, and pharmacy registrations.</p>
       </div>
-    </div>
 
-    <div class="component-container">
-      <app-activity-log />
+      <div class="activity-actions">
+        <app-activity-log />
+        <button class="view-activity-btn" routerLink="/admin/activity">
+          View All Activity
+          <span>→</span>
+        </button>
+      </div>
     </div>
   </section>
 

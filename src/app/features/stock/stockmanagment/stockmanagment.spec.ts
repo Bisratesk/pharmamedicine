@@ -1,16 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Stockmanagment } from './stockmanagment';
+import { StockManager } from './stockmanagment';
 
-describe('Stockmanagment', () => {
-  let component: Stockmanagment;
-  let fixture: ComponentFixture<Stockmanagment>;
+describe('StockManager', () => {
+  let component: StockManager;
+  let fixture: ComponentFixture<StockManager>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Stockmanagment],
+      imports: [StockManager],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Stockmanagment);
+    fixture = TestBed.createComponent(StockManager);
+    fixture.componentRef.setInput('pharmacyId', 1);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

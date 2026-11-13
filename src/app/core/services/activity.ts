@@ -4,8 +4,19 @@ import { ActivityLog } from '../models/activity.model';
 
 @Injectable({ providedIn: 'root' })
 export class ActivityService { 
-  private logs: ActivityLog[] = [];
-  private nextId = 1;//
+  private logs: ActivityLog[] = [
+    {
+      id: 1,
+      message: 'System audit logging initialized',
+      timestamp: new Date(Date.now() - 7200000).toISOString(),
+    },
+    {
+      id: 2,
+      message: 'Admin catalog initialized with default medicines',
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+    },
+  ];
+  private nextId = 3;
 
   log(message: string) {
     this.logs.unshift({  // unshift adds the new log to the beginning of the array
@@ -16,6 +27,6 @@ export class ActivityService {
   }
 
   getAll(): Observable<ActivityLog[]> { 
-    return of([...this.logs]).pipe(delay(300));
+    return of([...this.logs]).pipe(delay(200));
   }
 }

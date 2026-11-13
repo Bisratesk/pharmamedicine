@@ -1,42 +1,212 @@
+<div class="inventory-wrapper">
 
-<section>
-  <h3>Medicine stock</h3>
+  <!-- Inventory Quick Stats -->
+  <div class="inventory-stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrap primary">💊</div>
+      <div class="stat-details">
+        <span class="stat-value">{{ totalItems() }}</span>
+        <span class="stat-label">Unique Medicines</span>
+      </div>
+    </div>
 
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <input placeholder="Medicine name" formControlName="medicineName" />
-    <label>Price <input type="number" step="0.01" formControlName="price" /></label>
-    <label>Quantity <input type="number" formControlName="quantity" /></label>
+    <div class="stat-card">
+      <div class="stat-icon-wrap success">📦</div>
+      <div class="stat-details">
+        <span class="stat-value">{{ totalUnits() }}</span>
+        <span class="stat-label">Total Units in Stock</span>
+      </div>
+    </div>
 
-    <div class="actions">
-      <button type="submit" [disabled]="form.invalid || saving()">
-        {{ editingId() === null ? 'Add medicine' : 'Save changes' }}
-      </button>
+    <div class="stat-card">
+      <div class="stat-icon-wrap warning">⚠️</div>
+      <div class="stat-details">
+        <span class="stat-value">{{ lowStockCount() }}</span>
+        <span class="stat-label">Low Stock Alerts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Medicine Form Card -->
+  <div class="medicine-form-card" [class.is-editing]="editingId() !== null">
+    <div class="form-card-header">
+      <div class="form-title">
+        <span class="form-mode-badge">{{ editingId() === null ? '+ NEW ENTRY' : '✏️ EDITING' }}</span>
+        <h4>{{ editingId() === null ? 'Add Medicine to Inventory' : 'Update Medicine Details' }}</h4>
+      </div>
+
       @if (editingId() !== null) {
-        <button type="button" class="secondary" (click)="cancel()">Cancel</button>
+        <button type="button" class="cancel-edit-btn" (click)="cancel()">✕ Cancel Editing</button>
       }
     </div>
-  </form>
 
-  @if (items().length === 0) {
-    <p>No medicines in stock yet.</p>
-  } @else {
-    <table>
-      <thead>
-        <tr><th>Medicine</th><th>Price</th><th>Qty</th><th></th></tr>
-      </thead>
-      <tbody>
-        @for (item of items(); track item.id) {
-          <tr>
-            <td>{{ item.medicineName }}</td>
-            <td>{{ item.price }}</td>
-            <td [class.low]="item.quantity < 5">{{ item.quantity }}</td>
-            <td>
-              <button type="button" (click)="edit(item)">Edit</button>
-              <button type="button" class="danger" (click)="remove(item.id)">Delete</button>
-            </td>
-          </tr>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="stock-form">
+      <div class="form-fields-grid">
+
+        <!-- Medicine Name -->
+        <div class="field-col name-col">
+          <label for="medicineName">Medicine Name & Formulation</label>
+          <div class="field-input-wrap">
+            <span class="field-icon">💊</span>
+            <input
+              id="medicineName"
+              type="text"
+              placeholder="e.g. Paracetamol 500mg, Amoxicillin 250mg"
+              formControlName="medicineName"
+            />
+          </div>
+          @if (form.controls.medicineName.dirty && form.controls.medicineName.invalid) {
+            <small class="field-error">Medicine name must be at least 2 characters</small>
+          }
+        </div>
+
+        <!-- Price -->
+        <div class="field-col price-col">
+          <label for="price">Unit Price (ETB)</label>
+          <div class="field-input-wrap">
+            <span class="field-icon">ETB</span>
+            <input
+              id="price"
+              type="number"
+              step="0.01"
+              min="0.01"
+              placeholder="0.00"
+              formControlName="price"
+            />
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="field-col qty-col">
+          <label for="quantity">Quantity in Stock</label>
+          <div class="field-input-wrap">
+            <span class="field-icon">#</span>
+            <input
+              id="quantity"
+              type="number"
+              min="0"
+              placeholder="0"
+              formControlName="quantity"
+            />
+          </div>
+        </div>
+
+      </div>
+
+      <div class="form-actions-row">
+        <button type="submit" class="save-stock-btn" [disabled]="form.invalid || saving()">
+          @if (saving()) {
+            <span class="spinner-sm"></span>
+            <span>Saving...</span>
+          } @else {
+            <span>{{ editingId() === null ? 'Add Medicine to Stock' : 'Save Inventory Changes' }}</span>
+          }
+        </button>
+
+        @if (editingId() !== null) {
+          <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
         }
-      </tbody>
-    </table>
-  }
-</section>
+      </div>
+    </form>
+  </div>
+
+  <!-- Inventory Table Section -->
+  <div class="inventory-table-section">
+
+    <!-- Table Toolbar -->
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <span class="search-glyph">🔍</span>
+        <input
+          #search
+          type="text"
+          placeholder="Filter inventory by medicine name..."
+          (input)="searchQuery.set(search.value)"
+        />
+      </div>
+
+      <span class="inventory-count-badge">
+        Showing <strong>{{ filteredItems().length }}</strong> of {{ items().length }} items
+      </span>
+    </div>
+
+    <!-- Empty State -->
+    @if (items().length === 0) {
+      <div class="empty-inventory-box">
+        <div class="empty-icon">📦</div>
+        <h4>No medicines in inventory yet</h4>
+        <p>Use the form above to add your first medicine stock so customers can find your pharmacy.</p>
+      </div>
+    } @else if (filteredItems().length === 0) {
+      <div class="empty-inventory-box">
+        <div class="empty-icon">🔍</div>
+        <h4>No medicines match "{{ searchQuery() }}"</h4>
+        <p>Try searching for another medicine or clear your filter.</p>
+      </div>
+    }
+
+    <!-- Data Table -->
+    @else {
+      <div class="table-card">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th class="col-name">MEDICINE NAME</th>
+              <th class="col-price">PRICE (ETB)</th>
+              <th class="col-qty">STOCK STATUS</th>
+              <th class="col-actions">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of filteredItems(); track item.id) {
+              <tr class="table-row" [class.editing-row]="editingId() === item.id">
+                <td class="col-name">
+                  <div class="med-cell">
+                    <span class="med-icon">💊</span>
+                    <strong class="med-label">{{ item.medicineName }}</strong>
+                  </div>
+                </td>
+
+                <td class="col-price">
+                  <div class="price-cell">
+                    <strong>{{ item.price | number: '1.2-2' }}</strong>
+                    <span>ETB</span>
+                  </div>
+                </td>
+
+                <td class="col-qty">
+                  @if (item.quantity === 0) {
+                    <span class="status-pill out-of-stock">
+                      <span class="dot"></span> Out of Stock
+                    </span>
+                  } @else if (item.quantity < 10) {
+                    <span class="status-pill low-stock">
+                      <span class="dot"></span> Low: {{ item.quantity }} units left
+                    </span>
+                  } @else {
+                    <span class="status-pill in-stock">
+                      <span class="dot"></span> In Stock ({{ item.quantity }} units)
+                    </span>
+                  }
+                </td>
+
+                <td class="col-actions">
+                  <div class="action-buttons">
+                    <button type="button" class="btn-action edit" (click)="edit(item)" title="Edit medicine">
+                      ✏️ Edit
+                    </button>
+                    <button type="button" class="btn-action delete" (click)="remove(item.id)" title="Remove from inventory">
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  </div>
+
+</div>

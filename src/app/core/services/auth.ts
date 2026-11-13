@@ -33,7 +33,8 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     this.currentUser.set(null);
   }
 

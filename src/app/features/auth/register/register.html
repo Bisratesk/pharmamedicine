@@ -1,33 +1,179 @@
-<form [formGroup]="form" (ngSubmit)="submit()">
-  <h2>Create account</h2>
+<div class="auth-page">
+  <div class="auth-container">
 
-  <input placeholder="Full name" formControlName="fullName" />
-  @if (form.controls.fullName.dirty && form.controls.fullName.invalid) {
-    <small>Name must be at least 3 characters</small>
-  }
+    <!-- Left Hero Column -->
+    <div class="hero-panel">
+      <div class="hero-content">
 
-  <input type="email" placeholder="Email" formControlName="email" />
-  @if (form.controls.email.dirty && form.controls.email.invalid) {
-    <small>Enter a valid email</small>
-  }
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          <span>New Account Registration</span>
+        </div>
 
-  <input type="password" placeholder="Password" formControlName="password" />
-  @if (form.controls.password.dirty && form.controls.password.invalid) {
-    <small>Password must be at least 4 characters</small>
-  }
+        <h1 class="hero-title">
+          Join the <span class="highlight">Pharmacy Finder</span> Healthcare Network
+        </h1>
 
-  <select formControlName="role">
-    <option value="Customer">Customer</option>
-    <option value="PharmacyOwner">Pharmacy owner</option>
-  </select>
+        <p class="hero-subtitle">
+          Whether you are a pharmacy owner managing inventories or a customer locating vital medicines, our platform gives you instant access.
+        </p>
 
-  @if (error()) {
-    <small>{{ error() }}</small>
-  }
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-icon">🏥</div>
+            <div>
+              <strong>For Pharmacy Owners</strong>
+              <p>Register your store, gain admin verification, and broadcast real-time medicine availability.</p>
+            </div>
+          </div>
 
-  <button type="submit" [disabled]="form.invalid || loading()">
-    {{ loading() ? 'Creating...' : 'Register' }}
-  </button>
+          <div class="feature-item">
+            <div class="feature-icon">🔍</div>
+            <div>
+              <strong>For Patients & Customers</strong>
+              <p>Find prescribed medications at nearest approved pharmacies, compare prices, and check stock levels.</p>
+            </div>
+          </div>
+        </div>
 
-  <p>Already have an account? <a routerLink="/login">Login</a></p>
-</form>
+        <div class="hero-footer">
+          <span>Compliant Healthcare Platform • Role-Based Security</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right Form Column -->
+    <div class="form-panel">
+      <div class="form-card">
+
+        <div class="form-header">
+          <h2>Create your account</h2>
+          <p>Select your account role and enter your details to get started</p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+
+          <!-- Visual Role Selection Cards -->
+          <div class="form-group">
+            <label>Select Account Type</label>
+            <div class="role-grid">
+              
+              <div
+                class="role-card"
+                [class.selected]="form.controls.role.value === 'Customer'"
+                (click)="selectRole('Customer')"
+              >
+                <div class="role-icon">👤</div>
+                <div class="role-info">
+                  <strong>Customer</strong>
+                  <span>Search medicines & find nearby stores</span>
+                </div>
+                <span class="radio-indicator"></span>
+              </div>
+
+              <div
+                class="role-card"
+                [class.selected]="form.controls.role.value === 'PharmacyOwner'"
+                (click)="selectRole('PharmacyOwner')"
+              >
+                <div class="role-icon">🏥</div>
+                <div class="role-info">
+                  <strong>Pharmacy Owner</strong>
+                  <span>Manage pharmacy profile & medicine stock</span>
+                </div>
+                <span class="radio-indicator"></span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Full Name -->
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input
+                id="fullName"
+                type="text"
+                placeholder="Dr. Jane Doe / John Smith"
+                formControlName="fullName"
+                [class.invalid]="form.controls.fullName.dirty && form.controls.fullName.invalid"
+              />
+            </div>
+            @if (form.controls.fullName.dirty && form.controls.fullName.invalid) {
+              <small class="error-text">Full name must be at least 3 characters</small>
+            }
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉</span>
+              <input
+                id="email"
+                type="email"
+                placeholder="name@example.com"
+                formControlName="email"
+                [class.invalid]="form.controls.email.dirty && form.controls.email.invalid"
+              />
+            </div>
+            @if (form.controls.email.dirty && form.controls.email.invalid) {
+              <small class="error-text">Please enter a valid email address</small>
+            }
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password">Create Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input
+                id="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                placeholder="At least 4 characters"
+                formControlName="password"
+                [class.invalid]="form.controls.password.dirty && form.controls.password.invalid"
+              />
+              <button type="button" class="toggle-password" (click)="togglePassword()">
+                {{ showPassword() ? 'Hide' : 'Show' }}
+              </button>
+            </div>
+            @if (form.controls.password.dirty && form.controls.password.invalid) {
+              <small class="error-text">Password must be at least 4 characters</small>
+            }
+          </div>
+
+          <!-- Submission Error -->
+          @if (error()) {
+            <div class="alert-error">
+              <span>⚠️</span>
+              <span>{{ error() }}</span>
+            </div>
+          }
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-btn" [disabled]="form.invalid || loading()">
+            @if (loading()) {
+              <span class="spinner"></span>
+              <span>Creating Account...</span>
+            } @else {
+              <span>Create Account</span>
+              <span class="arrow">→</span>
+            }
+          </button>
+
+          <!-- Login Link -->
+          <div class="form-footer">
+            <span>Already have an account?</span>
+            <a routerLink="/login">Sign in</a>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>

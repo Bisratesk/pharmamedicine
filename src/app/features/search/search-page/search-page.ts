@@ -1,16 +1,16 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, OnDestroy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { StockService } from '../../../core/services/stock';
 import { SearchResult } from '../../../core/models/search.model';
 import { PrescriptionService } from '../../../core/services/prescription';
 
 @Component({
-  imports: [ReactiveFormsModule],
   selector: 'app-search-page',
+  imports: [ReactiveFormsModule],
   styleUrl: './search-page.css',
   templateUrl: './search-page.html',
 })
-export class SearchPage {
+export class SearchPage implements OnDestroy {
   term = new FormControl('', { nonNullable: true });
   results = signal<SearchResult[]>([]);
   searched = signal(false);
@@ -27,6 +27,8 @@ export class SearchPage {
   locationError = signal('');
   maxDistance = signal<number | null>(null);
 
+  popularMedicines = ['Paracetamol', 'Amoxicillin', 'Ibuprofen', 'Ciprofloxacin', 'Omeprazole', 'Cetirizine'];
+
   filtered = computed(() => {
     const loc = this.userLocation();
 
@@ -42,13 +44,13 @@ export class SearchPage {
 
     const maxDist = this.maxDistance();
     if (maxDist !== null && loc) {
-      list = list.filter(r => r.distanceKm! <= maxDist);
+      list = list.filter(r => r.distanceKm !== null && r.distanceKm <= maxDist);
     }
 
     const sort = this.sortBy();
     if (sort === 'priceAsc') list = [...list].sort((a, b) => a.price - b.price);
     if (sort === 'priceDesc') list = [...list].sort((a, b) => b.price - a.price);
-    if (sort === 'nearest' && loc) list = [...list].sort((a, b) => a.distanceKm! - b.distanceKm!);
+    if (sort === 'nearest' && loc) list = [...list].sort((a, b) => (a.distanceKm ?? 9999) - (b.distanceKm ?? 9999));
 
     return list;
   });
@@ -56,22 +58,40 @@ export class SearchPage {
   constructor(private stock: StockService, private prescription: PrescriptionService) {}
 
   onFileChosen(event: Event) {
-    const file = (event.target as HTMLInputElement).files?.[0]; // the file picked by the user
+    const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Please choose an image file.');
+      alert('Please choose an image file (PNG, JPG, JPEG).');
       return;
     }
 
+    // Clean up previous blob
+    if (this.previewUrl()) {
+      URL.revokeObjectURL(this.previewUrl()!);
+    }
+
     this.previewUrl.set(URL.createObjectURL(file));
-    this.detected.set([]); // clears any previous results
+    this.detected.set([]);
     this.uploading.set(true);
 
-    this.prescription.upload(file).subscribe(names => { // the service returns the detected medicine names
-      this.detected.set(names);
-      this.uploading.set(false);
+    this.prescription.upload(file).subscribe({
+      next: names => {
+        this.detected.set(names);
+        this.uploading.set(false);
+      },
+      error: () => {
+        this.uploading.set(false);
+      }
     });
+  }
+
+  clearPrescription() {
+    if (this.previewUrl()) {
+      URL.revokeObjectURL(this.previewUrl()!);
+      this.previewUrl.set(null);
+    }
+    this.detected.set([]);
   }
 
   searchFor(name: string) {
@@ -80,13 +100,19 @@ export class SearchPage {
   }
 
   search() {
-    if (!this.term.value.trim()) return;
+    const query = this.term.value.trim();
+    if (!query) return;
 
     this.loading.set(true);
-    this.stock.search(this.term.value).subscribe(list => {
-      this.results.set(list);
-      this.searched.set(true);
-      this.loading.set(false);
+    this.stock.search(query).subscribe({
+      next: list => {
+        this.results.set(list);
+        this.searched.set(true);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+      }
     });
   }
 
@@ -100,7 +126,7 @@ export class SearchPage {
 
   useMyLocation() {
     if (!navigator.geolocation) {
-      this.locationError.set('Your browser does not support location.');
+      this.locationError.set('Your browser does not support geolocation.');
       return;
     }
 
@@ -113,7 +139,7 @@ export class SearchPage {
         this.locating.set(false);
       },
       () => {
-        this.locationError.set('Could not get your location. Please allow location access.');
+        this.locationError.set('Could not get your location. Please check browser permissions.');
         this.locating.set(false);
       }
     );
@@ -121,6 +147,10 @@ export class SearchPage {
 
   setMaxDistance(value: string) {
     this.maxDistance.set(value === '' ? null : Number(value));
+  }
+
+  getDirectionsUrl(lat: number, lng: number): string {
+    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   }
 
   distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -131,5 +161,11 @@ export class SearchPage {
       Math.sin(dLat / 2) ** 2 +
       Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
     return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  ngOnDestroy() {
+    if (this.previewUrl()) {
+      URL.revokeObjectURL(this.previewUrl()!);
+    }
   }
 }
