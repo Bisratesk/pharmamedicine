@@ -1,24 +1,6 @@
-<button type="button" class="bell" (click)="toggle()" aria-label="Activity notifications">
-  🔔
+<div class="bell-indicator" aria-label="Activity notifications">
+  <span class="bell-icon">🔔</span>
   @if (unread() > 0) {
     <span class="badge">{{ unread() }}</span>
   }
-</button>
-
-@if (open()) {
-  <div class="panel">
-    <h4>System activity</h4>
-    @if (entries().length === 0) {
-      <p class="empty">No activity yet.</p>
-    } @else {
-      <ul>
-        @for (e of entries(); track e.id) {
-          <li>
-            <span class="time">{{ e.timestamp | date: 'short' }}</span>
-            <span>{{ e.message }}</span>
-          </li>
-        }
-      </ul>
-    }
-  </div>
-}
+</div>
