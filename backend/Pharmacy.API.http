@@ -1,0 +1,21 @@
+@host = https://localhost:7205
+
+### Register a customer
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Test Customer",
+  "email": "customer2@test.com",
+  "password": "Test@1234",
+  "role": "Customer"
+}
+
+### Login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@test.com",
+  "password": "Test@1234"
+}
