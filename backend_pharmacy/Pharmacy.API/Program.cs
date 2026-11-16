@@ -76,12 +76,21 @@ using (var scope = app.Services.CreateScope())
     foreach (var role in new[] { "Admin", "PharmacyOwner", "Customer" })
     {
         if (!await roles.RoleExistsAsync(role))
-            await roles.CreateAsync(new IdentityRole(role));
+        {
+            var result = await roles.CreateAsync(new IdentityRole(role));
+            if (!result.Succeeded)
+                throw new InvalidOperationException($"Could not create role '{role}': {string.Join("; ", result.Errors.Select(error => error.Description))}");
+        }
     }
 
     var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var adminEmail = builder.Configuration["Seed:AdminEmail"]!;
-    if (await users.FindByEmailAsync(adminEmail) is null)
+    var adminEmail = builder.Configuration["Seed:AdminEmail"];
+    var adminPassword = builder.Configuration["Seed:AdminPassword"];
+    if (string.IsNullOrWhiteSpace(adminEmail) != string.IsNullOrWhiteSpace(adminPassword))
+        throw new InvalidOperationException("Configure both Seed:AdminEmail and Seed:AdminPassword to seed an admin account.");
+
+    if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword)
+        && await users.FindByEmailAsync(adminEmail) is null)
     {
         var admin = new ApplicationUser
         {
@@ -89,9 +98,13 @@ using (var scope = app.Services.CreateScope())
             Email = adminEmail,
             FullName = "System Admin"
         };
-        var created = await users.CreateAsync(admin, builder.Configuration["Seed:AdminPassword"]!);
-        if (created.Succeeded)
-            await users.AddToRoleAsync(admin, "Admin");
+        var created = await users.CreateAsync(admin, adminPassword);
+        if (!created.Succeeded)
+            throw new InvalidOperationException($"Could not create admin user: {string.Join("; ", created.Errors.Select(error => error.Description))}");
+
+        var roleResult = await users.AddToRoleAsync(admin, "Admin");
+        if (!roleResult.Succeeded)
+            throw new InvalidOperationException($"Could not assign the Admin role: {string.Join("; ", roleResult.Errors.Select(error => error.Description))}");
     }
 }
 app.Run();

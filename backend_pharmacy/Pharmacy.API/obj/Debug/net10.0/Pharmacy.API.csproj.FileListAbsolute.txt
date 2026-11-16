@@ -170,3 +170,11 @@ C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\bin\Debug\net1
 C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\bin\Debug\net10.0\runtimes\win-x64\native\msalruntime.dll
 C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\bin\Debug\net10.0\runtimes\win-x86\native\msalruntime_x86.dll
 C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\obj\Debug\net10.0\Pharmacy.API.sourcelink.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\appsettings.Development.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\appsettings.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\Pharmacy.API.staticwebassets.endpoints.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\Pharmacy.API.exe
+C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\Pharmacy.API.deps.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\Pharmacy.API.runtimeconfig.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\Pharmacy.API.dll
+C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\Pharmacy.API.pdb
