@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace Pharmacy.API.DTOs;
-
 public class RegisterRequest
 {
     [Required]
