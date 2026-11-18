@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-
+//shape of the data that will be sent to the API when a user registers or logs in. It also defines the structure of the response that will be sent back to the client after successful authentication.
 namespace Pharmacy.API.DTOs;
 public class RegisterRequest
 {

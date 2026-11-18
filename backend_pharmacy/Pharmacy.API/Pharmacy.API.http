@@ -1,4 +1,4 @@
-@host = https://localhost:7205
+@host = http://localhost:5160
 
 ### Register a customer
 POST {{host}}/api/auth/register
@@ -6,7 +6,7 @@ Content-Type: application/json
 
 {
   "fullName": "Test Customer",
-  "email": "customer3@test.com",
+  "email": "bibii@test.com",
   "password": "Test@1234",
   "role": "Customer"
 }
