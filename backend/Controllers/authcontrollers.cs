@@ -4,6 +4,8 @@ using Pharmacy.API.DTOs;
 using Pharmacy.API.Interfaces;
 using Pharmacy.API.Models;
 
+//carry the two endpoints for register and login, and return the token and user info in the response
+
 namespace Pharmacy.API.Controllers;
 
 [ApiController]
