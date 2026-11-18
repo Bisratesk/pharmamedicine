@@ -281,7 +281,7 @@ namespace Pharmacy.API.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("PharmacyEntity");
+                    b.ToTable("Pharmacies");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

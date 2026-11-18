@@ -6,16 +6,65 @@ Content-Type: application/json
 
 {
   "fullName": "Test Customer",
-  "email": "bibii@test.com",
+  "email": "customer@test.com",
   "password": "Test@1234",
   "role": "Customer"
 }
 
-### Login
+### Login as customer
+# @name customerLogin
 POST {{host}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "customer@test.com",
+  "fullName": "Test Owner",
+  "email": "owner@test.com",
+  "password": "Test@1234",
+  "role": "PharmacyOwner"
+}
+
+### Login as owner
+# @name ownerLogin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "owner@test.com",
   "password": "Test@1234"
+}
+
+### Register a pharmacy (owner)
+POST {{host}}/api/pharmacies
+Content-Type: application/json
+Authorization: Bearer {{ownerLogin.response.body.$.token}}
+
+{
+  "name": "Mad Med",
+  "address": "Bole",
+  "phone": "0912345678",
+  "licenseNumber": "LIC-2345",
+  "latitude": 9.03,
+  "longitude": 38.74,
+  "openingTime": "08:00",
+  "closingTime": "22:00"
+}
+
+### Get my pharmacy (owner)
+GET {{host}}/api/pharmacies/mine
+Authorization: Bearer {{ownerLogin.response.body.$.token}}
+
+### Customer tries to register a pharmacy (should be 403)
+POST {{host}}/api/pharmacies
+Content-Type: application/json
+Authorization: Bearer {{customerLogin.response.body.$.token}}
+
+{
+  "name": "Not Allowed",
+  "address": "Bole",
+  "phone": "0912345678",
+  "licenseNumber": "LIC-9999",
+  "latitude": 9.03,
+  "longitude": 38.74,
+  "openingTime": "08:00",
+  "closingTime": "22:00"
 }
