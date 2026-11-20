@@ -88,4 +88,53 @@ public class PharmaciesController : ControllerBase
         ClosingTime = p.ClosingTime.ToString("HH:mm"),
         Status = p.Status.ToString()
     };
+    [HttpGet]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> GetAll([FromQuery] string? status, [FromQuery] string? search)
+{
+    var query = _db.Pharmacies.AsNoTracking().AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(status))
+    {
+        if (!Enum.TryParse<PharmacyStatus>(status, ignoreCase: true, out var parsed))
+            return BadRequest(new { message = "Status must be Pending, Approved or Rejected." });
+
+        query = query.Where(p => p.Status == parsed);
+    }
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var q = search.Trim();
+        query = query.Where(p =>
+            p.Name.Contains(q) ||
+            p.LicenseNumber.Contains(q) ||
+            p.Address.Contains(q) ||
+            p.Phone.Contains(q));
+    }
+
+    var pharmacies = await query
+        .OrderBy(p => p.Status)
+        .ThenByDescending(p => p.CreatedAt)
+        .ToListAsync();
+
+    return Ok(pharmacies.Select(ToDto));
+}
+
+[HttpPut("{id:int}/status")]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> UpdateStatus(int id, UpdateStatusRequest req)
+{
+    if (!Enum.TryParse<PharmacyStatus>(req.Status, ignoreCase: true, out var newStatus)
+        || !Enum.IsDefined(newStatus))
+        return BadRequest(new { message = "Status must be Pending, Approved or Rejected." });
+
+    var pharmacy = await _db.Pharmacies.FindAsync(id);
+    if (pharmacy is null)
+        return NotFound(new { message = "Pharmacy not found." });
+
+    pharmacy.Status = newStatus;
+    await _db.SaveChangesAsync();
+
+    return Ok(ToDto(pharmacy));
+}
 }

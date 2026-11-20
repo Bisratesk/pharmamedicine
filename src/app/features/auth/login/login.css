@@ -376,7 +376,9 @@ form {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .form-footer {
@@ -397,9 +399,11 @@ form {
   .auth-container {
     grid-template-columns: 1fr;
   }
+
   .hero-panel {
     display: none;
   }
+
   .form-panel {
     padding: 36px 24px;
   }
