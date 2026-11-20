@@ -29,3 +29,4 @@ public class PharmacyRequest
     [Required, RegularExpression(@"^([01]\d|2[0-3]):[0-5]\d$")]
     public string ClosingTime { get; set; } = "20:00";
 }
+//difference between PharmacyRequest and PharmacyDto is that PharmacyRequest is used for creating or updating a pharmacy, while PharmacyDto is used for retrieving pharmacy data. PharmacyRequest has validation attributes to ensure that the data sent to the API is valid, while PharmacyDto does not have any validation attributes.    

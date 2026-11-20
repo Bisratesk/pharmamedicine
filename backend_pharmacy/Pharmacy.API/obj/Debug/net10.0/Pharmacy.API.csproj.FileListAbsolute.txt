@@ -6,7 +6,6 @@ C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\bin\Debug\net1
 C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\bin\Debug\net10.0\Pharmacy.API.runtimeconfig.json
 C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\bin\Debug\net10.0\Pharmacy.API.dll
 C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\bin\Debug\net10.0\Pharmacy.API.pdb
-C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\bin\Debug\net10.0\Microsoft.OpenApi.dll
 C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\obj\Debug\net10.0\Pharmacy.API.csproj.AssemblyReference.cache
 C:\Users\Abu\Desktop\pharmacyintern\backend_pharmacy\Pharmacy.API\obj\Debug\net10.0\rpswa.dswa.cache.json

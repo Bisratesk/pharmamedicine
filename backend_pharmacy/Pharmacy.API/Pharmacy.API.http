@@ -22,6 +22,16 @@ Content-Type: application/json
   "password": "Test@1234",
   "role": "PharmacyOwner"
 }
+### Register an owner
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Test Owner",
+  "email": "owner@test.com",
+  "password": "Test@1234",
+  "role": "PharmacyOwner"
+}
 
 ### Login as owner
 # @name ownerLogin

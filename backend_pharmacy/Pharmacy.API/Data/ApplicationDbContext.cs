@@ -6,8 +6,9 @@ using Pharmacy.API.Models;
 namespace Pharmacy.API.Data;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
-
 {
+    public DbSet<PharmacyEntity> Pharmacies => Set<PharmacyEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
 {
     base.OnModelCreating(builder);
@@ -30,5 +31,4 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
-    public DbSet<PharmacyEntity> Pharmacies => Set<PharmacyEntity>();
 }
