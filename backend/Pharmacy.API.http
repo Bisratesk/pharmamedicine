@@ -1,6 +1,20 @@
 @host = http://localhost:5160
+# Swagger UI: http://localhost:5160/swagger (or https://localhost:7205/swagger)
+@pharmacyId = 1
 
-### Register a customer
+# Paste each token ONCE: send the matching LOGIN request, copy the long "token"
+# text from the response (no quotes), paste it after the = sign.
+@customerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjA2MTM5OGRjLTU5NzEtNDBhMC04Y2YxLWVhYTE0NWJkZGM5OSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImN1c3RvbWVyQHRlc3QuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IlRlc3QgQ3VzdG9tZXIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJDdXN0b21lciIsImV4cCI6MTc5NTY5ODM5NSwiaXNzIjoiUGhhcm1hY3kuQVBJIiwiYXVkIjoiUGhhcm1hY3lGaW5kZXIuVUkifQ.BqgyQ0VlDwVZn9CnHTblqr8AnS5XlrtwftkehqSv_B4
+@ownerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjA3OWQxMTRhLTI0OWEtNGM2NC1hZjY4LTY0MDgxMzU3ZDRiNSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6Im93bmVyQHRlc3QuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IlRlc3QgT3duZXIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJQaGFybWFjeU93bmVyIiwiZXhwIjoxNzk1Njk4NDQwLCJpc3MiOiJQaGFybWFjeS5BUEkiLCJhdWQiOiJQaGFybWFjeUZpbmRlci5VSSJ9.hE5OswXqYy0Q5WwUzY2Qd03AzFeBaM5PHWWS0Fdy45o
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEwNmRmMWZjLTgxYTItNDNiMy1iYmExLWFiYTNkYTM3MjFkOSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHBoYXJtYWN5LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJTeXN0ZW0gQWRtaW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc5NTY5ODgzOCwiaXNzIjoiUGhhcm1hY3kuQVBJIiwiYXVkIjoiUGhhcm1hY3lGaW5kZXIuVUkifQ.eK4v9X8r53bvJi-70f-7_QoGdDMVndoffPfGC9-7j9o
+
+# After adding stock, paste the returned "id" here:
+@paracetamolId = 
+@amoxId = 
+
+### 0. SETUP
+
+### Register a customer (201, or 409 if it exists)
 POST {{host}}/api/auth/register
 Content-Type: application/json
 
@@ -11,18 +25,7 @@ Content-Type: application/json
   "role": "Customer"
 }
 
-### Login as customer
-# @name customerLogin
-POST {{host}}/api/auth/login
-Content-Type: application/json
-
-{
-  "fullName": "Test Owner",
-  "email": "owner@test.com",
-  "password": "Test@1234",
-  "role": "PharmacyOwner"
-}
-### Register an owner
+### Register an owner (201, or 409 if it exists)
 POST {{host}}/api/auth/register
 Content-Type: application/json
 
@@ -33,8 +36,16 @@ Content-Type: application/json
   "role": "PharmacyOwner"
 }
 
-### Login as owner
-# @name ownerLogin
+### LOGIN customer: copy token into @customerToken
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@test.com",
+  "password": "Test@1234"
+}
+
+### LOGIN owner: copy token into @ownerToken
 POST {{host}}/api/auth/login
 Content-Type: application/json
 
@@ -43,10 +54,21 @@ Content-Type: application/json
   "password": "Test@1234"
 }
 
-### Register a pharmacy (owner)
+### LOGIN admin: copy token into @adminToken
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@pharmacy.com",
+  "password": "Admin@12345"
+}
+
+### 1. PHARMACIES (owner)
+
+### Register a pharmacy (201, then 409 if repeated)
 POST {{host}}/api/pharmacies
 Content-Type: application/json
-Authorization: Bearer {{ownerLogin.response.body.$.token}}
+Authorization: Bearer {{ownerToken}}
 
 {
   "name": "Mad Med",
@@ -59,14 +81,14 @@ Authorization: Bearer {{ownerLogin.response.body.$.token}}
   "closingTime": "22:00"
 }
 
-### Get my pharmacy (owner)
+### Get my pharmacy (200)
 GET {{host}}/api/pharmacies/mine
-Authorization: Bearer {{ownerLogin.response.body.$.token}}
+Authorization: Bearer {{ownerToken}}
 
-### Customer tries to register a pharmacy (should be 403)
+### Customer registers a pharmacy (403)
 POST {{host}}/api/pharmacies
 Content-Type: application/json
-Authorization: Bearer {{customerLogin.response.body.$.token}}
+Authorization: Bearer {{customerToken}}
 
 {
   "name": "Not Allowed",
@@ -78,41 +100,217 @@ Authorization: Bearer {{customerLogin.response.body.$.token}}
   "openingTime": "08:00",
   "closingTime": "22:00"
 }
-### A1. Login as admin
-# @name adminLogin
-POST {{host}}/api/auth/login
-Content-Type: application/json
 
-{
-  "email": "admin@pharmacy.com",
-  "password": "Admin@12345"
-}
+#################################################
+### 2. PHARMACIES (admin)
+#################################################
 
-### A2. Admin: list all pharmacies
+### A1. List all (200)
 GET {{host}}/api/pharmacies
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEwNmRmMWZjLTgxYTItNDNiMy1iYmExLWFiYTNkYTM3MjFkOSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHBoYXJtYWN5LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJTeXN0ZW0gQWRtaW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc5NTE2ODUyMywiaXNzIjoiUGhhcm1hY3kuQVBJIiwiYXVkIjoiUGhhcm1hY3lGaW5kZXIuVUkifQ.7OtjtS9ifv--X5fGI6Z2QhQfun9foBzAgnm4znLG-v4
+Authorization: Bearer {{adminToken}}
 
-### A3. Admin: only pending
+### A2. Only pending (200)
 GET {{host}}/api/pharmacies?status=Pending
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEwNmRmMWZjLTgxYTItNDNiMy1iYmExLWFiYTNkYTM3MjFkOSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHBoYXJtYWN5LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJTeXN0ZW0gQWRtaW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc5NTE2ODUyMywiaXNzIjoiUGhhcm1hY3kuQVBJIiwiYXVkIjoiUGhhcm1hY3lGaW5kZXIuVUkifQ.7OtjtS9ifv--X5fGI6Z2QhQfun9foBzAgnm4znLG-v4
+Authorization: Bearer {{adminToken}}
 
-### A4. Admin: search
+### A3. Search (200)
 GET {{host}}/api/pharmacies?search=mad
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEwNmRmMWZjLTgxYTItNDNiMy1iYmExLWFiYTNkYTM3MjFkOSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHBoYXJtYWN5LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJTeXN0ZW0gQWRtaW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc5NTE2ODUyMywiaXNzIjoiUGhhcm1hY3kuQVBJIiwiYXVkIjoiUGhhcm1hY3lGaW5kZXIuVUkifQ.7OtjtS9ifv--X5fGI6Z2QhQfun9foBzAgnm4znLG-v4       
+Authorization: Bearer {{adminToken}}
 
-### A5. Admin: approve pharmacy 1
-PUT {{host}}/api/pharmacies/1/status
+### A4. Approve (200)
+PUT {{host}}/api/pharmacies/{{pharmacyId}}/status
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEwNmRmMWZjLTgxYTItNDNiMy1iYmExLWFiYTNkYTM3MjFkOSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHBoYXJtYWN5LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJTeXN0ZW0gQWRtaW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc5NTE2ODUyMywiaXNzIjoiUGhhcm1hY3kuQVBJIiwiYXVkIjoiUGhhcm1hY3lGaW5kZXIuVUkifQ.7OtjtS9ifv--X5fGI6Z2QhQfun9foBzAgnm4znLG-v4
+Authorization: Bearer {{adminToken}}
 
 {
   "status": "Approved"
 }
 
-### A6. Admin: pending again (should now be empty)
+### A5. Pending again (200, empty after A4)
 GET {{host}}/api/pharmacies?status=Pending
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+Authorization: Bearer {{adminToken}}
 
-### A7. Owner tries the admin list (should be 403)
+### A6. Owner tries the admin list (403)
 GET {{host}}/api/pharmacies
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+Authorization: Bearer {{ownerToken}}
+
+### A7. Invalid status (400)
+PUT {{host}}/api/pharmacies/{{pharmacyId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "Banana"
+}
+
+### 3. STOCK (send A4 first so the pharmacy is Approved)
+
+### S1. Owner adds Paracetamol (201). Paste the "id" into @paracetamolId
+POST {{host}}/api/pharmacies/{{pharmacyId}}/stock
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "medicineName": "Paracetamol 500mg",
+  "price": 45.50,
+  "quantity": 60
+}
+
+### S2. Owner lists stock (200)
+GET {{host}}/api/pharmacies/{{pharmacyId}}/stock
+Authorization: Bearer {{ownerToken}}
+
+### S3. Owner edits Paracetamol (200)
+PUT {{host}}/api/stock/{{paracetamolId}}
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "medicineName": "Paracetamol 500mg",
+  "price": 42.00,
+  "quantity": 55
+}
+
+### S4. Admin sees all stock (200)
+GET {{host}}/api/stock
+Authorization: Bearer {{adminToken}}
+
+### S5. Customer adds stock (403)
+POST {{host}}/api/pharmacies/{{pharmacyId}}/stock
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "medicineName": "Nope",
+  "price": 10,
+  "quantity": 1
+}
+
+### S6. Price 0 (400)
+POST {{host}}/api/pharmacies/{{pharmacyId}}/stock
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "medicineName": "Bad Price",
+  "price": 0,
+  "quantity": 1
+}
+
+#################################################
+### 4. SEARCH (customer; needs S1 done)
+#################################################
+
+### Q1. Basic (200)
+GET {{host}}/api/search?medicine=para
+Authorization: Bearer {{customerToken}}
+
+### Q2. With location (200, distanceKm about 3)
+GET {{host}}/api/search?medicine=para&lat=9.05&lng=38.76
+Authorization: Bearer {{customerToken}}
+
+### Q3. Within 1 km (200, empty)
+GET {{host}}/api/search?medicine=para&lat=9.05&lng=38.76&maxKm=1
+Authorization: Bearer {{customerToken}}
+
+### Q4. Within 10 km, nearest first (200)
+GET {{host}}/api/search?medicine=para&lat=9.05&lng=38.76&maxKm=10&sort=nearest
+Authorization: Bearer {{customerToken}}
+
+### Q5. Max price 10 (200, empty)
+GET {{host}}/api/search?medicine=para&maxPrice=10
+Authorization: Bearer {{customerToken}}
+
+### Q6. No medicine (400)
+GET {{host}}/api/search?medicine=
+Authorization: Bearer {{customerToken}}
+
+### Q7. Nearest without location (400)
+GET {{host}}/api/search?medicine=para&sort=nearest
+Authorization: Bearer {{customerToken}}
+
+### Q8. Owner searches (403)
+GET {{host}}/api/search?medicine=para
+Authorization: Bearer {{ownerToken}}
+
+### Q9. No token (401)
+GET {{host}}/api/search?medicine=para
+
+#################################################
+### 5. ACTIVITY LOG
+#################################################
+
+### L1. Admin reads the log (200)
+GET {{host}}/api/activity
+Authorization: Bearer {{adminToken}}
+
+### L2. Owner reads the log (403)
+GET {{host}}/api/activity
+Authorization: Bearer {{ownerToken}}
+
+### L3. No token (401)
+GET {{host}}/api/activity
+
+### L4. take=0 (400)
+GET {{host}}/api/activity?take=0
+Authorization: Bearer {{adminToken}}
+
+### T1. Owner adds Amoxicillin (201). Paste the "id" into @amoxId
+POST {{host}}/api/pharmacies/{{pharmacyId}}/stock
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "medicineName": "Amoxicillin 500mg",
+  "price": 130.00,
+  "quantity": 25
+}
+
+### T2. Read the log: newest line should be "... added Amoxicillin ..."
+GET {{host}}/api/activity
+Authorization: Bearer {{adminToken}}
+
+### T3. Admin edits Amoxicillin (200). Log: "Admin updated ..."
+PUT {{host}}/api/stock/{{amoxId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "medicineName": "Amoxicillin 500mg",
+  "price": 125.00,
+  "quantity": 20
+}
+
+### T4. Admin sets status (200). Log: "... was Approved"
+PUT {{host}}/api/pharmacies/{{pharmacyId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "Approved"
+}
+
+### T5. Entries after id 2 (200)
+GET {{host}}/api/activity?afterId=2
+Authorization: Bearer {{adminToken}}
+
+### T6. Duplicate add (409) and NO new log line
+POST {{host}}/api/pharmacies/{{pharmacyId}}/stock
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "medicineName": "Amoxicillin 500mg",
+  "price": 130.00,
+  "quantity": 25
+}
+
+### T7. Owner deletes Amoxicillin (204). Log: "... removed Amoxicillin ..."
+DELETE {{host}}/api/stock/{{amoxId}}
+Authorization: Bearer {{ownerToken}}
+
+### 6. CLEANUP (send last)
+
+### Owner deletes Paracetamol (204)
+DELETE {{host}}/api/stock/{{paracetamolId}}
+Authorization: Bearer {{ownerToken}}
