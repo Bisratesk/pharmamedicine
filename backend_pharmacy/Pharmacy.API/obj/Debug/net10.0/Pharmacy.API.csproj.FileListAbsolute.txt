@@ -177,3 +177,10 @@ C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd
 C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\Pharmacy.API.runtimeconfig.json
 C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\Pharmacy.API.dll
 C:\Users\Abu\AppData\Local\Temp\PharmacyApi-build-feaf5098c96f46cd9a6225d0df84cd96\Pharmacy.API.pdb
+C:\Users\Abu\AppData\Local\Temp\PharmacyAPIBuild\appsettings.Development.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyAPIBuild\appsettings.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyAPIBuild\Pharmacy.API.staticwebassets.endpoints.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyAPIBuild\Pharmacy.API.deps.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyAPIBuild\Pharmacy.API.runtimeconfig.json
+C:\Users\Abu\AppData\Local\Temp\PharmacyAPIBuild\Pharmacy.API.dll
+C:\Users\Abu\AppData\Local\Temp\PharmacyAPIBuild\Pharmacy.API.pdb

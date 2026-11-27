@@ -5,20 +5,25 @@ using Microsoft.EntityFrameworkCore;
 using Pharmacy.API.Data;
 using Pharmacy.API.DTOs;
 using Pharmacy.API.Models;
+using Pharmacy.API.Interfaces;
 
 namespace Pharmacy.API.Controllers;
-
+/* it is a controller for the pharmacies, it has endpoints for registering a pharmacy, 
+getting the pharmacy of the logged in owner, getting all pharmacies (for admin), 
+and updating the status of a pharmacy (for admin)*/
 [ApiController]
 [Route("api/pharmacies")]
 [Authorize]
 public class PharmaciesController : ControllerBase
 {
-    private readonly ApplicationDbContext _db;
+private readonly ApplicationDbContext _db;
+private readonly IActivityService _activity;
 
-    public PharmaciesController(ApplicationDbContext db)
-    {
-        _db = db;
-    }
+public PharmaciesController(ApplicationDbContext db, IActivityService activity)
+{
+    _db = db;
+    _activity = activity;
+}
 
     [HttpPost]
     [Authorize(Roles = "PharmacyOwner")]
@@ -55,7 +60,7 @@ public class PharmaciesController : ControllerBase
 
         _db.Pharmacies.Add(pharmacy);
         await _db.SaveChangesAsync();
-
+    await _activity.LogAsync($"{pharmacy.Name} registered (Pending)");   
         return CreatedAtAction(nameof(GetMine), null, ToDto(pharmacy));
     }
 
@@ -134,6 +139,7 @@ public async Task<IActionResult> UpdateStatus(int id, UpdateStatusRequest req)
 
     pharmacy.Status = newStatus;
     await _db.SaveChangesAsync();
+    await _activity.LogAsync($"{pharmacy.Name} was {newStatus}");   
 
     return Ok(ToDto(pharmacy));
 }
