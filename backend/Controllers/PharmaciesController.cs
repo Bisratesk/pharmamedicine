@@ -1,0 +1,146 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Pharmacy.API.Data;
+using Pharmacy.API.DTOs;
+using Pharmacy.API.Models;
+using Pharmacy.API.Interfaces;
+
+namespace Pharmacy.API.Controllers;
+/* it is a controller for the pharmacies, it has endpoints for registering a pharmacy, 
+getting the pharmacy of the logged in owner, getting all pharmacies (for admin), 
+and updating the status of a pharmacy (for admin)*/
+[ApiController]
+[Route("api/pharmacies")]
+[Authorize]
+public class PharmaciesController : ControllerBase
+{
+private readonly ApplicationDbContext _db;
+private readonly IActivityService _activity;
+
+public PharmaciesController(ApplicationDbContext db, IActivityService activity)
+{
+    _db = db;
+    _activity = activity;
+}
+
+    [HttpPost]
+    [Authorize(Roles = "PharmacyOwner")]
+    public async Task<IActionResult> Register(PharmacyRequest req)
+    {
+        var ownerId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        if (!TimeOnly.TryParseExact(req.OpeningTime, "HH:mm", out var opens) ||
+            !TimeOnly.TryParseExact(req.ClosingTime, "HH:mm", out var closes))
+            return BadRequest(new { message = "Times must look like 08:00." });
+
+        if (closes <= opens)
+            return BadRequest(new { message = "Closing time must be after opening time." });
+
+        if (await _db.Pharmacies.AnyAsync(p => p.OwnerId == ownerId))
+            return Conflict(new { message = "You have already registered a pharmacy." });
+
+        if (await _db.Pharmacies.AnyAsync(p => p.LicenseNumber == req.LicenseNumber))
+            return Conflict(new { message = "A pharmacy with this license number already exists." });
+
+        var pharmacy = new PharmacyEntity
+        {
+            OwnerId = ownerId,
+            Name = req.Name.Trim(),
+            Address = req.Address.Trim(),
+            Phone = req.Phone.Trim(),
+            LicenseNumber = req.LicenseNumber.Trim(),
+            Latitude = req.Latitude,
+            Longitude = req.Longitude,
+            OpeningTime = opens,
+            ClosingTime = closes
+            // Status stays Pending, set by the entity's default
+        };
+
+        _db.Pharmacies.Add(pharmacy);
+        await _db.SaveChangesAsync();
+    await _activity.LogAsync($"{pharmacy.Name} registered (Pending)");   
+        return CreatedAtAction(nameof(GetMine), null, ToDto(pharmacy));
+    }
+
+    [HttpGet("mine")]
+    [Authorize(Roles = "PharmacyOwner")]
+    public async Task<IActionResult> GetMine()
+    {
+        var ownerId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var pharmacy = await _db.Pharmacies.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.OwnerId == ownerId);
+
+        if (pharmacy is null)
+            return NotFound(new { message = "You have not registered a pharmacy yet." });
+
+        return Ok(ToDto(pharmacy));
+    }
+
+    private static PharmacyDto ToDto(PharmacyEntity p) => new()
+    {
+        Id = p.Id,
+        OwnerId = p.OwnerId,
+        Name = p.Name,
+        Address = p.Address,
+        Phone = p.Phone,
+        LicenseNumber = p.LicenseNumber,
+        Latitude = p.Latitude,
+        Longitude = p.Longitude,
+        OpeningTime = p.OpeningTime.ToString("HH:mm"),
+        ClosingTime = p.ClosingTime.ToString("HH:mm"),
+        Status = p.Status.ToString()
+    };
+    [HttpGet]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> GetAll([FromQuery] string? status, [FromQuery] string? search)
+{
+    var query = _db.Pharmacies.AsNoTracking().AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(status))
+    {
+        if (!Enum.TryParse<PharmacyStatus>(status, ignoreCase: true, out var parsed))
+            return BadRequest(new { message = "Status must be Pending, Approved or Rejected." });
+
+        query = query.Where(p => p.Status == parsed);
+    }
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var q = search.Trim();
+        query = query.Where(p =>
+            p.Name.Contains(q) ||
+            p.LicenseNumber.Contains(q) ||
+            p.Address.Contains(q) ||
+            p.Phone.Contains(q));
+    }
+
+    var pharmacies = await query
+        .OrderBy(p => p.Status)
+        .ThenByDescending(p => p.CreatedAt)
+        .ToListAsync();
+
+    return Ok(pharmacies.Select(ToDto));
+}
+
+[HttpPut("{id:int}/status")]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> UpdateStatus(int id, UpdateStatusRequest req)
+{
+    if (!Enum.TryParse<PharmacyStatus>(req.Status, ignoreCase: true, out var newStatus)
+        || !Enum.IsDefined(newStatus))
+        return BadRequest(new { message = "Status must be Pending, Approved or Rejected." });
+
+    var pharmacy = await _db.Pharmacies.FindAsync(id);
+    if (pharmacy is null)
+        return NotFound(new { message = "Pharmacy not found." });
+
+    pharmacy.Status = newStatus;
+    await _db.SaveChangesAsync();
+    await _activity.LogAsync($"{pharmacy.Name} was {newStatus}");   
+
+    return Ok(ToDto(pharmacy));
+}
+}

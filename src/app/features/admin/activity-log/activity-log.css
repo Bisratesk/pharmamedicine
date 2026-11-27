@@ -1,0 +1,46 @@
+:host {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bell-indicator {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+
+.bell-icon {
+  display: inline-block;
+  line-height: 1;
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  background: #ef4444;
+  color: white;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
